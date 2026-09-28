@@ -394,8 +394,8 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <div class="pfile"><button class="btn" id="pImport">Abrir arquivo… (HD, nuvem)</button></div>
     <div class="msec">
       <h4>Músicas</h4>
-      <label class="keep"><input type="checkbox" id="keepAudio"><span>Guardar as músicas neste iPad<small>Desligado: as músicas não ocupam espaço no iPad. Ao abrir o show, toque em <b>Conectar músicas</b> e selecione todas de uma vez no HD, Dropbox ou Drive; o Lumia liga cada uma ao seu pad pelo nome.</small></span></label>
-      <div class="row"><button class="btn" id="pLink">Conectar músicas…</button><span class="muse" id="pUse"></span></div>
+      <label class="keep"><input type="checkbox" id="keepAudio"><span>Guardar as músicas neste iPad<small>Desligado: as músicas não ocupam espaço no iPad. Ao abrir o projeto, o Lumia pede a <b>pasta</b> do HD, Dropbox ou Drive onde estão as músicas e liga cada uma ao seu pad pelo nome.</small></span></label>
+      <div class="row"><button class="btn" id="pLink">Conectar pasta de músicas…</button><span class="muse" id="pUse"></span></div>
     </div>
     <div class="btns"><span></span><button class="btn" id="pClose">Fechar</button></div>
     <p><b>No iPad</b>: o projeto fica guardado aqui (é pequeno, só os ajustes). <b>Em arquivo</b>: o Lumia gera um arquivo .lumia.json e abre o compartilhamento; escolha <b>Salvar em Arquivos</b> e o HD, Dropbox ou Drive. Para abrir de volta, use <b>Abrir arquivo…</b>.</p>
@@ -403,6 +403,15 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 </div>
 <input type="file" id="projPicker" accept=".json,application/json" hidden>
 <input type="file" id="linkPicker" accept="audio/*,.mp3,.m4a,.aac,.wav,.aif,.aiff,.flac,.caf" multiple hidden>
+<input type="file" id="dirPicker" webkitdirectory multiple hidden>
+<div class="sheet" id="linkSheet" hidden>
+  <div class="card" role="dialog" aria-labelledby="linkT">
+    <h3 id="linkT">Conectar as músicas</h3>
+    <p id="linkMsg">Faltam músicas deste projeto.</p>
+    <div class="msec"><ol style="margin:0;padding-left:22px;display:grid;gap:6px"><li>Conecte o HD ao iPad (ou deixe a pasta do Dropbox ou do Drive disponível offline).</li><li>Toque em <b>Escolher pasta</b> e selecione a pasta do show. O Lumia procura as músicas lá dentro, inclusive em subpastas, e liga cada uma ao seu pad pelo nome.</li></ol><div class="muse" id="linkLast"></div></div>
+    <div class="btns" style="align-items:center"><div class="pfile"><button class="btn on" id="linkDir">Escolher pasta…</button><button class="btn" id="linkFiles">Escolher arquivos…</button></div><button class="btn" id="linkLater">Agora não</button></div>
+  </div>
+</div>
 
 <!-- MIDI -->
 <div class="sheet" id="midi" hidden>
@@ -494,7 +503,7 @@ function idbPut(store,key,val){if(!db)return Promise.resolve(false);return new P
 function idbGet(store,key){if(!db)return Promise.resolve(undefined);return new Promise(res=>{try{const r=db.transaction(store).objectStore(store).get(key);r.onsuccess=()=>res(r.result);r.onerror=()=>res(undefined)}catch(e){res(undefined)}})}
 function idbDel(store,key){if(!db)return Promise.resolve();return new Promise(res=>{try{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(key);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
 let saveT=null;
-function snapshot(){return {v:3,keepAudio:S.keepAudio,widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
+function snapshot(){return {v:3,keepAudio:S.keepAudio,musicFolder:S.musicFolder||'',widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
 function hashStr(t){let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36)+':'+t.length}
 function saveSoon(){clearTimeout(saveT);saveT=setTimeout(async()=>{
   const data=snapshot();data.project={id:proj.id,name:proj.name,createdAt:proj.createdAt,savedHash:proj.savedHash,savedAt:proj.savedAt};
@@ -1053,7 +1062,7 @@ $('#helpClose').onclick=()=>{$('#help').hidden=true};
 $('#help').addEventListener('click',e=>{if(e.target.id==='help')e.target.hidden=true});
 document.addEventListener('keydown',e=>{
   if(e.target.matches('input[type=text],input[type=number]')||e.target.closest('.vs'))return;
-  if(e.key==='Escape'){stopAll(0.03);$('#help').hidden=true;$('#proj').hidden=true;$('#midi').hidden=true;$('#add').hidden=true;if(!$('#ed').hidden)closeEditor()}
+  if(e.key==='Escape'){stopAll(0.03);$('#help').hidden=true;$('#linkSheet').hidden=true;$('#proj').hidden=true;$('#midi').hidden=true;$('#add').hidden=true;if(!$('#ed').hidden)closeEditor()}
 });
 let toastT=null;
 function toast(msg){const el=$('#toast');el.textContent=msg;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},3200)}
@@ -1102,19 +1111,39 @@ async function setKeepAudio(on){
 }
 async function paintUse(){const el=$('#pUse');if(!el)return;try{const e=await navigator.storage.estimate();el.textContent='O Lumia usa '+(e.usage/1e6).toFixed(0)+' MB neste iPad'}catch(_){el.textContent=''}}
 function paintLink(){const n=S.pads.filter(p=>p.missing).length,pill=$('#linkPill');pill.hidden=!n;pill.textContent='⚠ '+n+' faltando'}
-function openLink(){$('#linkPicker').click()}
+function openLink(){
+  const miss=S.pads.filter(p=>p.missing);
+  $('#linkMsg').textContent=miss.length?('Faltam '+miss.length+' música'+(miss.length>1?'s':'')+' deste projeto: '+miss.slice(0,4).map(p=>p.name).join(', ')+(miss.length>4?'…':'')+'.'):'Todas as músicas deste projeto estão conectadas. Você pode escolher a pasta de novo para atualizar.';
+  $('#linkLast').textContent=S.musicFolder?'Última pasta usada neste projeto: '+S.musicFolder:'';
+  $('#linkSheet').hidden=false;
+}
+function closeLink(){$('#linkSheet').hidden=true}
 $('#linkPill').onclick=openLink;
-$('#linkPicker').addEventListener('change',async e=>{
-  const files=[...(e.target.files||[])].filter(isAudio);e.target.value='';if(!files.length)return;
-  const norm=t=>String(t||'').toLowerCase().replace(/\.[^.]+$/,'').trim();
+$('#linkDir').onclick=()=>{closeLink();$('#dirPicker').click()};
+$('#linkFiles').onclick=()=>{closeLink();$('#linkPicker').click()};
+$('#linkLater').onclick=closeLink;
+$('#linkSheet').addEventListener('click',e=>{if(e.target.id==='linkSheet')closeLink()});
+async function linkFrom(list,viaFolder){
+  const files=[...(list||[])].filter(isAudio);
+  if(!files.length){toast(viaFolder?'Nenhuma música encontrada nessa pasta.':'Nenhum arquivo de áudio escolhido.');return}
+  if(viaFolder){const rp=files[0].webkitRelativePath||'';const top=rp.split('/')[0];if(top)S.musicFolder=top}
+  const norm=t=>String(t||'').toLowerCase().normalize('NFC').replace(/\.[^.]+$/,'').trim();
+  const byFull=new Map(),byBase=new Map();
+  for(const f of files){const k=f.name.toLowerCase().normalize('NFC');if(!byFull.has(k))byFull.set(k,f);const b=norm(f.name);if(!byBase.has(b))byBase.set(b,f)}
+  const todo=S.pads.filter(p=>p.missing||!blobs.has(p.fileKey));
+  toast('Procurando '+todo.length+' música'+(todo.length!==1?'s':'')+' em '+files.length+' arquivo'+(files.length!==1?'s':'')+'…');
   let ok=0;
-  for(const p of S.pads){if(!p.missing&&blobs.has(p.fileKey))continue;
-    const f=files.find(x=>x.name===p.fileName)||files.find(x=>norm(x.name)===norm(p.fileName))||files.find(x=>norm(x.name)===norm(p.name));
-    if(f){await attach(p,f,S.keepAudio&&p.keep!==false);ok++}}
+  for(const p of todo){
+    const f=(p.fileName&&byFull.get(p.fileName.toLowerCase().normalize('NFC')))||byBase.get(norm(p.fileName))||byBase.get(norm(p.name));
+    if(f){await attach(p,f,S.keepAudio&&p.keep!==false);if(!p.fileName)p.fileName=f.name;ok++}
+  }
   renderGrid();saveSoon();
   const left=S.pads.filter(p=>p.missing);
-  toast(ok+' música'+(ok!==1?'s conectadas':' conectada')+(left.length?'. Ainda faltam: '+left.slice(0,3).map(p=>p.name).join(', ')+(left.length>3?'…':''):'. Tudo pronto.'));
-});
+  toast(ok+' música'+(ok!==1?'s conectadas':' conectada')+(left.length?'. Não achei: '+left.slice(0,3).map(p=>p.name).join(', ')+(left.length>3?'…':''):'. Tudo pronto para o show.'));
+}
+$('#linkPicker').addEventListener('change',async e=>{const l=[...(e.target.files||[])];e.target.value='';await linkFrom(l,false)});
+$('#dirPicker').addEventListener('change',async e=>{const l=[...(e.target.files||[])];e.target.value='';await linkFrom(l,true)});
+function askLinkIfNeeded(){if(S.pads.some(p=>p.missing))setTimeout(openLink,400)}
 
 /* ---------- Projects: save, save as, new, open, recent, export, import ---------- */
 function isDirty(){return !proj.savedHash||hashStr(JSON.stringify(snapshot()))!==proj.savedHash}
@@ -1165,7 +1194,7 @@ async function saveProject(asName,where){
 }
 async function loadState(st){
   S.pads=(st.pads||[]).map(p=>({stopMode:p.stopMode||(p.retrig==='stop'&&p.fadeOut>0?'fade':'cut'),...p}));
-  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};S.keepAudio=st.keepAudio!==false;S.pick=null;
+  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};S.keepAudio=st.keepAudio!==false;S.musicFolder=st.musicFolder||'';S.pick=null;
   S.decks.forEach((d,i)=>{d.cue=null;d.bank=i;d.vol=1});S.active=0;
   (st.banks||[st.bank||0,1,2]).forEach((b,i)=>{if(S.decks[i])S.decks[i].bank=Math.min(BANKS-1,b||0)});
   (st.deckVols||[]).forEach((v,i)=>{if(S.decks[i]&&isFinite(v))S.decks[i].vol=v});
@@ -1179,8 +1208,8 @@ async function openProject(id){
   if(!data||!meta){toast('Projeto não encontrado neste iPad.');return}
   stopAll(0.05);await loadState(data);
   proj={id,name:meta.name,createdAt:meta.createdAt,savedAt:meta.updatedAt,savedHash:hashStr(JSON.stringify(snapshot()))};
-  meta.openedAt=Date.now();await putMeta(meta);renderAll();saveSoon();closeProj();
-  const miss=S.pads.filter(p=>p.missing).length;toast('Aberto: '+meta.name+(miss?' · '+miss+' música'+(miss>1?'s':'')+' faltando: toque em ⚠ para conectar':''));
+  meta.openedAt=Date.now();await putMeta(meta);renderAll();saveSoon();closeProj();askLinkIfNeeded();
+  const miss=S.pads.filter(p=>p.missing).length;toast('Aberto: '+meta.name);
 }
 function newProject(){stopAll(0.05);S.pads=[];S.decks.forEach((d,i)=>{d.cue=null;d.bank=i});S.active=0;
   proj={id:null,name:'Sem título',createdAt:null,savedAt:null,savedHash:hashStr(JSON.stringify(snapshot()))};renderAll();saveSoon();closeProj();toast('Novo projeto.')}
@@ -1217,7 +1246,7 @@ $('#proj').addEventListener('click',e=>{
   if(b.id==='pSaveAs'){const r=$('#pAsRow');r.hidden=!r.hidden;if(!r.hidden){const i=$('#pAsName');i.value=proj.id?proj.name+' (cópia)':(proj.name==='Sem título'?'':proj.name);i.focus()}return}
   if(b.id==='pAsIpad'||b.id==='pAsFile'){const n=$('#pAsName').value.trim();if(!n){toast('Dê um nome ao projeto.');return}saveProject(n,b.id==='pAsFile'?'file':'ipad').then(ok=>{if(ok)$('#pAsRow').hidden=true});return}
   if(b.dataset.openfile){if(isDirty()&&S.pads.length)armed(b,()=>$('#projPicker').click(),'Descartar alterações?');else $('#projPicker').click();return}
-  if(b.id==='pLink'){openLink();return}
+  if(b.id==='pLink'){closeProj();openLink();return}
   if(b.id==='pNew'){if(isDirty()&&S.pads.length)armed(b,newProject,'Descartar?');else newProject();return}
   if(b.closest('#pTabs')){projTab=b.dataset.v;segSet('#pTabs',projTab);renderProjList();return}
   if(b.dataset.open){const id=b.dataset.open;if(isDirty()&&S.pads.length)armed(b,()=>openProject(id),'Descartar alterações?');else openProject(id);return}
@@ -1236,8 +1265,7 @@ $('#projPicker').addEventListener('change',async e=>{
   const now=Date.now();
   proj={id:uid(),where:'file',name:(obj.name||file.name.replace(/\.lumia\.json$|\.json$/i,'')),createdAt:now,savedAt:now,savedHash:hashStr(JSON.stringify(snapshot()))};
   await putMeta({id:proj.id,name:proj.name,where:'file',fileName:file.name,createdAt:now,updatedAt:now,openedAt:now,pads:S.pads.length});
-  renderAll();saveSoon();closeProj();toast('Aberto do arquivo: '+proj.name);
-  const miss=S.pads.filter(p=>p.missing).length;if(miss)setTimeout(()=>toast(miss+' música'+(miss>1?'s':'')+' faltando: toque em ⚠ na coluna esquerda e selecione as músicas no HD ou na nuvem.'),1600);
+  renderAll();saveSoon();closeProj();toast('Aberto do arquivo: '+proj.name);askLinkIfNeeded();
 });
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();if(e.shiftKey){openProj();$('#pSaveAs').click()}else saveProject()}});
 
@@ -1252,7 +1280,7 @@ document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLower
     await loadState(st);if(st.project)proj=Object.assign(proj,st.project);
     saveSoon();
   }else{try{await makeExamples()}catch(e){}}
-  vsPaint('master');renderGrid();paintProj();paintLink();paintAudio();requestAnimationFrame(frame);midiInit();
+  vsPaint('master');renderGrid();paintProj();paintLink();paintAudio();askLinkIfNeeded();requestAnimationFrame(frame);midiInit();
 })();
 })();
 </script>
