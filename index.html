@@ -263,7 +263,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 .swatches button{width:36px;height:36px;border-radius:50%;border:2px solid transparent;cursor:pointer;background:var(--c)}
 .swatches button.on{border-color:var(--text);box-shadow:0 0 0 2px var(--panel) inset}
 .edbody{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;min-height:0}
-.edleft{display:grid;grid-template-rows:auto minmax(80px,1fr) auto auto auto auto;gap:10px;min-height:0}
+.edleft{display:grid;grid-template-rows:auto minmax(70px,1fr) auto auto auto auto auto;gap:10px;min-height:0}
 .edplay{display:grid;grid-template-columns:1.3fr 1fr 1fr auto;gap:8px;align-items:center}
 .edplay .btn{min-width:0;padding:0 8px}
 .btn.cut{border-color:var(--danger);color:var(--danger);min-height:64px}
@@ -351,8 +351,9 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
           <input class="num" type="number" id="e-out" data-f="outPoint" min="0" step="0.1" inputmode="decimal" aria-label="OUT em segundos, 0 é o fim">
           <button class="btn" data-mark="outPoint">Marcar OUT</button>
         </div>
+        <div class="opt"><span>1º toque no pad</span><div class="seg" id="e-start"><button data-v="cue">Deixa em CUE</button><button data-v="direct">Toca direto</button></div></div>
         <div class="opt"><span>Loop</span><div class="seg" id="e-loop"><button data-v="0">Off</button><button data-v="1">On (IN → OUT)</button></div></div>
-        <div class="opt"><span>Stop do 3º toque e ao trocar de pad</span><div class="seg" id="e-stopmode"><button data-v="cut">Stop seco</button><button data-v="fade">Stop com fade out</button></div></div>
+        <div class="opt"><span>Stop (ao parar ou trocar de pad)</span><div class="seg" id="e-stopmode"><button data-v="cut">Stop seco</button><button data-v="fade">Stop com fade out</button></div></div>
         <div class="edfoot"><button class="btn" id="e-replace">Trocar arquivo</button><button class="btn x" id="e-del">Remover pad</button></div>
       </div>
       <div class="edmix" id="e-mix"></div>
@@ -436,7 +437,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <h3 id="helpT">Como usar no palco</h3>
     <ol>
       <li>Toque num pad vazio para adicionar música: <b>Arquivos</b> (iPad, HD, iCloud, Dropbox, Google Drive pelos apps) ou <b>Google Drive</b> direto.</li>
-      <li>1º toque no pad: <b style="color:var(--cue)">CUE</b>. 2º toque: <b style="color:var(--live)">PLAY</b>. 3º toque: <b>STOP</b>.</li>
+      <li>1º toque no pad: <b style="color:var(--cue)">CUE</b>. 2º toque: <b style="color:var(--live)">PLAY</b>. 3º toque: <b>STOP</b>. Na janela do pad, <b>1º toque: Toca direto</b> faz esse pad tocar já no primeiro toque (o segundo toque para).</li>
       <li>Tocar em outro pad para o que está tocando e coloca o novo em CUE. Cada pad escolhe se esse stop é seco ou com fade out.</li>
       <li><b>LOOP</b> no próprio pad liga e desliga a repetição, mesmo com a música tocando.</li>
       <li>Janela do pad: toque no <b>⋯</b> ou segure o pad por meio segundo. Lá ficam Play, Stop, Stop com fade, volume, fades, velocidade, IN/OUT, loop, tipo de stop e cor.</li>
@@ -528,7 +529,7 @@ function tap(pad,d=S.active){
   if(!pad)return;setActive(d);const dk=S.decks[d];
   if(pad.missing){relink(pad);return}
   if(isLive(pad.id)){stopPad(pad);if(dk.cue===pad.id)dk.cue=null;paint();return}
-  if(dk.cue===pad.id){play(pad,d);return}
+  if(dk.cue===pad.id||pad.startMode==='direct'){play(pad,d);return}
   stopOthers(d,null);dk.cue=pad.id;paint();
 }
 function play(pad,d=S.active){if(!pad||pad.missing){if(pad)relink(pad);return}const dk=S.decks[d];stopOthers(d,pad.id);if(dk.cue===pad.id)dk.cue=null;if(!isLive(pad.id))start(pad,d);else{const pl=players.get(pad.id);if(pl.deck!==d){try{pl.g.disconnect();pl.g.connect(deckNode(d))}catch(e){}pl.deck=d}paint()}}
@@ -615,7 +616,7 @@ async function analyse(blob){
 }
 function peaksOf(buf,n=300){const d=buf.getChannelData(0),step=Math.max(1,Math.floor(d.length/n)),out=[];
   for(let i=0;i<n;i++){let m=0;const s=i*step,e=Math.min(d.length,s+step);for(let j=s;j<e;j+=16){const v=Math.abs(d[j]);if(v>m)m=v}out.push(+m.toFixed(3))}return out}
-function newPad(bank,slot,name,fileKey,meta){return{id:uid(),bank,slot,name,fileKey,color:COLORS[0],volume:1,fadeIn:0,fadeOut:0,xfTime:1.5,speed:1,loop:false,stopMode:'cut',inPoint:0,outPoint:0,duration:meta.duration||0,peaks:meta.peaks}}
+function newPad(bank,slot,name,fileKey,meta){return{id:uid(),bank,slot,name,fileKey,color:COLORS[0],volume:1,fadeIn:0,fadeOut:0,xfTime:1.5,speed:1,loop:false,stopMode:'cut',startMode:'cue',inPoint:0,outPoint:0,duration:meta.duration||0,peaks:meta.peaks}}
 const isAudio=f=>(f.type||'').startsWith('audio')||/\.(mp3|m4a|aac|wav|aiff?|flac|caf|ogg|opus)$/i.test(f.name||'');
 function nextFree(bank,slot){for(let i=bank*PADS_PER_BANK+slot;i<BANKS*PADS_PER_BANK;i++){const b=Math.floor(i/PADS_PER_BANK),s=i%PADS_PER_BANK;if(!padAt(b,s))return[b,s]}return null}
 async function attach(p,blob,keep,recalc){
@@ -741,7 +742,7 @@ function padHTML(p,s){
       <button class="more" data-more="${p.id}" aria-label="Abrir controles do pad">⋯</button>
       <div class="pmeta"><div class="pleft"><button class="lp ${p.loop?'on':''}" data-loop="${p.id}" aria-pressed="${!!p.loop}" aria-label="Loop ${p.loop?'ligado':'desligado'}">LOOP <b>${p.loop?'ON':'OFF'}</b></button>
         <span class="ptime" data-ptime="${p.id}">${p.missing?(p.driveId?'baixar de novo':'reconectar'):fmt(len)}</span></div>
-        <span class="ptags">${p.stopMode==='fade'?'fade':''} <span>${s+1}</span></span></div></div>`}
+        <span class="ptags">${p.startMode==='direct'?'▶ direto':''} ${p.stopMode==='fade'?'fade':''} <span>${s+1}</span></span></div></div>`}
 function renderGrid(){
   const box=$('#decks'),multi=S.nDecks>1;
   box.className='decks n'+S.nDecks+(multi?' multi':'')+(S.arrange?' arrange':'')+(S.pick?' picking':'');
@@ -933,7 +934,7 @@ function openEditor(id){
   $('#e-slot').textContent=label(p);$('#e-name').value=p.name;
   $('#e-colors').innerHTML=COLORS.map(c=>`<button data-color="${c}" style="--c:${c}" class="${c===p.color?'on':''}" aria-label="Cor ${c}"></button>`).join('');
   $('#e-in').value=(+p.inPoint).toFixed(1);$('#e-out').value=(+p.outPoint).toFixed(1);$('#e-dur').textContent='de '+fmt(p.duration);
-  segSet('#e-loop',p.loop?'1':'0');segSet('#e-stopmode',p.stopMode||'cut');
+  segSet('#e-loop',p.loop?'1':'0');segSet('#e-stopmode',p.stopMode||'cut');segSet('#e-start',p.startMode||'cue');
   const st=(lab,id,cfg)=>`<div class="strip"><label for="vs-${id}">${lab}</label>${vsHTML(id,cfg)}</div>`;
   const live=()=>{const pl=players.get(p.id);return pl&&!pl.stopping?pl:null};
   $('#e-mix').innerHTML=
@@ -957,7 +958,7 @@ ed.addEventListener('click',e=>{
   if(b.dataset.color){p.color=b.dataset.color;document.querySelectorAll('#e-colors button').forEach(x=>x.classList.toggle('on',x===b));saveSoon();return}
   const seg=b.closest('.seg');
   if(seg){const v=b.dataset.v;segSet('#'+seg.id,v);
-    if(seg.id==='e-loop'){p.loop=v==='1';paintLoop(p)}if(seg.id==='e-stopmode')p.stopMode=v;saveSoon();return}
+    if(seg.id==='e-loop'){p.loop=v==='1';paintLoop(p)}if(seg.id==='e-stopmode')p.stopMode=v;if(seg.id==='e-start'){p.startMode=v;renderGrid()}saveSoon();return}
   if(b.dataset.mark){const pl=players.get(p.id);if(!pl||pl.stopping){toast('Toque o pad para marcar na posição atual.');return}
     const tm=+pl.el.currentTime.toFixed(1),f=b.dataset.mark;
     if(f==='inPoint'&&p.outPoint&&tm>=p.outPoint-0.1)return;if(f==='outPoint'&&tm<=p.inPoint+0.1)return;
