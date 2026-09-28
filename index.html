@@ -407,6 +407,11 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <div class="plist" id="pList"></div>
     <div class="pfile"><button class="btn" id="pImport">Abrir arquivo… (HD, nuvem)</button></div>
     <div class="msec">
+      <h4>Onde você está: <span id="pWhere">…</span></h4>
+      <p class="muse" style="margin:0">No iPad, o Lumia no Safari, o Lumia da Tela de Início e o Lumia dentro do Claude guardam projetos separados. Para levar tudo de um para o outro: <b>Exportar backup</b> aqui, <b>Importar backup</b> lá.</p>
+      <div class="row"><button class="btn" id="pBackup">Exportar backup (todos os projetos)</button><button class="btn" id="pRestore">Importar backup</button></div>
+    </div>
+    <div class="msec">
       <h4>Músicas</h4>
       <label class="keep"><input type="checkbox" id="keepAudio"><span>Guardar as músicas neste iPad<small>Desligado: as músicas não ocupam espaço no iPad. Ao abrir o projeto, o Lumia pede a <b>pasta</b> do HD, Dropbox ou Drive onde estão as músicas e liga cada uma ao seu pad pelo nome.</small></span></label>
       <div class="row"><button class="btn" id="pLink">Conectar pasta de músicas…</button><span class="muse" id="pUse"></span></div>
@@ -472,6 +477,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
       <li>Sliders: arraste para cima ou para baixo. Tocar sem arrastar não muda nada. Com teclado, <kbd>Esc</kbd> para tudo.</li>
       <li><b>Time code</b>: no topo de cada janela aparecem a faixa tocando, o tempo decorrido e o que falta. Fica âmbar nos últimos 30 s e vermelho piscando nos últimos 10 s.</li>
       <li><b>Reordenar</b>: segure o pad por meio segundo até ele levantar e arraste. Deslizar o dedo sem segurar só rola a janela. Solte num espaço vazio, ou em cima de outro pad: ele entra ali e os seguintes andam uma casa para a direita. Para levar a outro banco, pare o dedo meio segundo sobre o botão do banco. Dá para soltar em outra janela. <b>Travar</b> (pé da coluna esquerda) impede arrastar sem querer no show.</li>
+      <li><b>Safari, Tela de Início e Claude guardam projetos separados.</b> Use sempre o mesmo. Para mudar, Projeto › Exportar backup num e Importar backup no outro.</li>
       <li><b>Offline</b>: depois de abrir uma vez com internet, o Lumia abre sem rede. No Safari, use Compartilhar › Adicionar à Tela de Início para abrir em tela cheia, como app.</li>
       <li><b>Projeto</b> (no topo da coluna esquerda): Salvar, Salvar como, Novo, Abrir e Abrir recentes. O ponto âmbar indica alterações não salvas. Com teclado, <kbd>⌘S</kbd> salva.</li>
       <li><b>nanoKONTROL2</b>: toque em MIDI, na coluna da esquerda, para ver o mapa dos botões.</li>
@@ -1218,6 +1224,37 @@ $('#linkPicker').addEventListener('change',async e=>{const l=[...(e.target.files
 $('#dirPicker').addEventListener('change',async e=>{const l=[...(e.target.files||[])];e.target.value='';await linkFrom(l,true)});
 function askLinkIfNeeded(){if(S.pads.some(p=>p.missing))setTimeout(openLink,400)}
 
+
+/* ---------- Where the app is running, and full backup of every project ---------- */
+function whereAmI(){
+  if(window.claude&&typeof window.claude.use==='function')return 'Lumia dentro do Claude';
+  const sa=(navigator.standalone===true)||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);
+  return sa?'app da Tela de Início':'site no navegador (Safari)';
+}
+async function exportBackup(){
+  const metas=await listProjects(),projects=[];
+  for(const m of metas){if(m.where==='file')continue;const d=await idbGet('kv','proj:'+m.id);if(d)projects.push({meta:m,data:d})}
+  const body=JSON.stringify({lumia:'ipad-backup',v:1,createdAt:new Date().toISOString(),from:whereAmI(),projects,current:{project:proj,data:snapshot()}});
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  const fname='Lumia backup '+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+'h'+p(d.getMinutes())+'.lumia.json';
+  if(await saveFile(fname,body))toast('Backup com '+projects.length+' projeto'+(projects.length!==1?'s':'')+' enviado: '+fname);
+}
+async function importBackup(obj){
+  let n=0,skipped=0;const cur=await listProjects();
+  for(const it of (obj.projects||[])){if(!it||!it.meta||!it.data||!Array.isArray(it.data.pads))continue;
+    const have=cur.find(x=>x.id===it.meta.id);
+    if(have&&(have.updatedAt||0)>=(it.meta.updatedAt||0)){skipped++;continue}
+    await idbPut('kv','proj:'+it.meta.id,it.data);await putMeta(Object.assign({},it.meta,{where:'ipad'}));n++}
+  // the project that was open when the backup was made becomes the open one here too
+  if(obj.current&&obj.current.data&&Array.isArray(obj.current.data.pads)){
+    stopAll(0.05);S.played.clear();savePlayed();await loadState(obj.current.data);
+    const cp=obj.current.project||{};proj={id:cp.id||null,where:cp.where||'ipad',name:cp.name||'Sem título',createdAt:cp.createdAt||null,savedAt:cp.savedAt||null,savedHash:cp.savedHash||null};
+    renderAll();saveSoon();}
+  renderProjList();
+  toast(n+' projeto'+(n!==1?'s importados':' importado')+(skipped?', '+skipped+' já estava'+(skipped>1?'m':'')+' atualizado'+(skipped>1?'s':''):'')+'.');
+  askLinkIfNeeded();
+}
+
 /* ---------- Projects: save, save as, new, open, recent, export, import ---------- */
 function isDirty(){return !proj.savedHash||hashStr(JSON.stringify(snapshot()))!==proj.savedHash}
 function when(ts){if(!ts)return'';const d=new Date(ts);const p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes())}
@@ -1308,7 +1345,7 @@ async function renderProjList(){
   box.innerHTML=l.map(m=>{const f=m.where==='file';return `<div class="prow ${m.id===proj.id?'cur':''}"><div><b>${esc(m.name)}</b><span>${m.id===proj.id?'aberto · ':''}${f?'arquivo (HD/nuvem)':'no iPad'} · ${when(m.updatedAt)} · ${m.pads||0} pads</span></div>
     <button class="btn ${m.id===proj.id?'':'on'}" ${f?'data-openfile="1"':`data-open="${m.id}"`}>${f?'Abrir arquivo…':(m.id===proj.id?'Reabrir':'Abrir')}</button><button class="btn x" data-delp="${m.id}" aria-label="${f?'Tirar da lista':'Apagar projeto'} ${esc(m.name)}">✕</button></div>`}).join('');
 }
-function openProj(){paintProj();paintUse();$('#keepAudio').checked=S.keepAudio;$('#pAsRow').hidden=true;segSet('#pTabs',projTab);renderProjList();$('#proj').hidden=false}
+function openProj(){$('#pWhere').textContent=whereAmI();paintProj();paintUse();$('#keepAudio').checked=S.keepAudio;$('#pAsRow').hidden=true;segSet('#pTabs',projTab);renderProjList();$('#proj').hidden=false}
 function closeProj(){$('#proj').hidden=true}
 $('#projBtn').onclick=openProj;
 $('#pClose').onclick=closeProj;
@@ -1320,6 +1357,8 @@ $('#proj').addEventListener('click',e=>{
   if(b.id==='pAsIpad'||b.id==='pAsFile'){const n=$('#pAsName').value.trim();if(!n){toast('Dê um nome ao projeto.');return}saveProject(n,b.id==='pAsFile'?'file':'ipad').then(ok=>{if(ok)$('#pAsRow').hidden=true});return}
   if(b.dataset.openfile){if(isDirty()&&S.pads.length)armed(b,()=>$('#projPicker').click(),'Descartar alterações?');else $('#projPicker').click();return}
   if(b.id==='pLink'){closeProj();openLink();return}
+  if(b.id==='pBackup'){exportBackup();return}
+  if(b.id==='pRestore'){$('#projPicker').click();return}
   if(b.id==='pNew'){if(isDirty()&&S.pads.length)armed(b,newProject,'Descartar?');else newProject();return}
   if(b.closest('#pTabs')){projTab=b.dataset.v;segSet('#pTabs',projTab);renderProjList();return}
   if(b.dataset.open){const id=b.dataset.open;if(isDirty()&&S.pads.length)armed(b,()=>openProject(id),'Descartar alterações?');else openProject(id);return}
@@ -1333,6 +1372,7 @@ function getDownloads(){if(!dlP)dlP=(window.claude&&typeof window.claude.use==='
 $('#projPicker').addEventListener('change',async e=>{
   const file=(e.target.files||[])[0];e.target.value='';if(!file)return;
   let obj;try{obj=JSON.parse(await file.text())}catch(_){toast('Esse arquivo não é um projeto do Lumia.');return}
+  if(obj&&obj.lumia==='ipad-backup'){await importBackup(obj);closeProj();return}
   if(!obj||obj.lumia!=='ipad-project'||!obj.data||!Array.isArray(obj.data.pads)){toast('Esse arquivo não é um projeto do Lumia.');return}
   stopAll(0.05);await loadState(obj.data);
   const now=Date.now();

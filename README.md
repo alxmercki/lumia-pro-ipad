@@ -17,6 +17,7 @@ Pads de áudio para palco no iPad, derivado do Lumia Pro v5. Um arquivo HTML, se
 - Músicas pelo app Arquivos (iPad, HD, iCloud, Dropbox, Google Drive). Opcional: não guardar no iPad e conectar as músicas a cada sessão, selecionando todas de uma vez.
 
 ## Limites conhecidos
+- No iPad, o Safari, o app da Tela de Início e a versão dentro do Claude guardam projetos separados. Use Projeto › Exportar backup / Importar backup para levar todos os projetos de um para o outro.
 - Um app web no iPad não guarda acesso permanente a pastas do HD ou da nuvem (o Safari não tem File System Access API). No modo sem cópia, ao abrir o projeto o app pede a pasta do HD ou da nuvem (iPadOS 18.4 ou mais novo) e reconecta tudo pelo nome; esse passo se repete a cada abertura.
 - MIDI (nanoKONTROL2): o mapa está no código, mas o Safari do iPad não tem Web MIDI. Funciona em Chrome/Edge no computador; no iPad só com app nativo.
 - Busca direta no Google Drive só existe na versão dentro do Claude (usa o conector do Claude).
