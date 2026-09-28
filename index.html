@@ -88,7 +88,7 @@ button{font:inherit;color:inherit}
 .pill.warn{border-color:var(--cue);color:var(--cue)}
 .pill.ok{border-color:var(--live);color:var(--live)}
 .rail .sep{height:1px;background:var(--line2);margin:8px 6px 4px}
-.rail .help{align-self:center;width:52px;height:52px;min-width:0;padding:0;border-radius:50%;background:transparent;font-size:18px;color:var(--muted)}
+.rail .help{align-self:center;width:48px;height:48px;min-width:0;padding:0;border-radius:50%;background:transparent;font-size:18px;color:var(--muted)}
 button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(--mono);font-size:11px}
 .midi-t{width:100%;border-collapse:collapse;font-size:14px}
 .midi-t th,.midi-t td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
@@ -104,10 +104,49 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 .split::before{content:'';position:absolute;inset:0 -8px}
 .split i{width:4px;height:64px;border-radius:2px;background:var(--line2)}
 .split.drag i,.split:active i{background:var(--accent);height:120px}
-.deck{display:grid;grid-template-columns:minmax(0,1fr) 52px;grid-template-rows:minmax(0,1fr) auto;gap:10px;min-height:0;border-radius:16px}
-.deck .grid{grid-column:1;grid-row:1}
-.deck .banks{grid-column:1/-1;grid-row:2}
-.dvol{grid-column:2;grid-row:1;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0;text-align:center}
+.deck{display:grid;grid-template-columns:minmax(0,1fr) 52px;grid-template-rows:auto minmax(0,1fr) auto;gap:10px;min-height:0;border-radius:16px}
+.deck .grid{grid-column:1;grid-row:2}
+.deck .banks{grid-column:1/-1;grid-row:3}
+.nowbar{grid-column:1/-1;grid-row:1;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;min-height:52px;padding:6px 14px;border-radius:12px;border:1px solid var(--line2);background:var(--rail)}
+.nowbar .nname{font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:1}
+.nowbar .nname small{display:block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.12em;color:var(--muted)}
+.nowbar .nel,.nowbar .nrem{font-family:var(--mono);font-variant-numeric:tabular-nums;position:relative;z-index:1;text-align:right;line-height:1.05}
+.nowbar .nel{font-size:15px;color:var(--muted)}
+.nowbar .nrem{font-size:28px;font-weight:600}
+.nowbar .nel small,.nowbar .nrem small{display:block;font-size:9px;letter-spacing:.14em;color:var(--muted);font-weight:600}
+.nowbar .nprog{position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--live)}
+.nowbar.idle .nel,.nowbar.idle .nrem{visibility:hidden}
+.nowbar.idle .nname{color:var(--muted)}
+.nowbar.cue{border-color:var(--cue)}
+.nowbar.cue .nname{color:var(--cue)}
+.nowbar.play{border-color:var(--live)}
+.nowbar.warn{border-color:var(--cue);background:color-mix(in srgb,var(--cue) 14%,var(--rail))}
+.nowbar.warn .nrem{color:var(--cue)}
+.nowbar.warn .nprog{background:var(--cue)}
+.nowbar.crit{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 18%,var(--rail))}
+.nowbar.crit .nrem{color:var(--danger)}
+.nowbar.crit .nprog{background:var(--danger)}
+@media (prefers-reduced-motion:no-preference){.nowbar.crit .nrem{animation:blink 1s steps(2,start) infinite}}
+@keyframes blink{50%{opacity:.35}}
+.decks.multi .nowbar{min-height:44px;padding:4px 10px;gap:8px}
+.decks.multi .nowbar .nrem{font-size:21px}
+.decks.multi .nowbar .nel{font-size:12px}
+.deck.tiny .nowbar .nel{display:none}
+.decks.arrange .pad[data-pad]{outline:1px dashed var(--line2);outline-offset:-4px}
+.pad.picked{outline:3px solid var(--accent)!important;outline-offset:1px!important;transform:scale(.96)}
+.decks.picking .pad.empty{border-color:var(--accent);color:var(--accent)}
+.decks.picking .pad.empty span{display:none}
+.decks.picking .pad.empty::after{content:'MOVER AQUI';font-size:11px;letter-spacing:.08em}
+.railfoot{display:grid;grid-template-columns:1fr 44px;gap:6px;align-items:center}
+.railfoot .arr{min-height:48px;padding:0 2px;font-size:12px;min-width:0;text-transform:none;letter-spacing:0}
+.railfoot .help{width:44px;height:44px}
+.nowbar i{font-style:normal}
+.pill.link{border-color:var(--danger);color:var(--danger)}
+.msec{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--line2)}
+.msec h4{margin:0;font-size:15px}
+.msec .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.muse{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.dvol{grid-column:2;grid-row:2;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0;text-align:center}
 .dvol label{font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:600;white-space:nowrap}
 .deck.active .dvol label{color:var(--accent)}
 .dvol .vs{border-radius:18px;min-height:0}
@@ -283,9 +322,9 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <div class="wins" id="wins" role="group" aria-label="Quantas janelas de pads"><button data-win="1">1</button><button data-win="2">2</button><button data-win="3">3</button></div>
     <div class="mlabel">MASTER</div>
     <div class="mwrap" id="masterBox"></div>
-    <div class="status"><span class="pill warn" id="audioPill">Som: toque</span><span class="pill" id="storePill">…</span><button class="pill warn" id="midiPill" title="Controlador MIDI">MIDI –</button></div>
+    <div class="status"><span class="pill warn" id="audioPill">Som: toque</span><span class="pill" id="storePill">…</span><button class="pill warn" id="midiPill" title="Controlador MIDI">MIDI –</button><button class="pill link" id="linkPill" hidden title="Conectar as músicas deste projeto">⚠ faltando</button></div>
     <div class="sep" aria-hidden="true"></div>
-    <button class="btn help" id="helpBtn" aria-label="Ajuda">?</button>
+    <div class="railfoot"><button class="btn arr" id="arrBtn" aria-pressed="false" title="Reordenar os pads">Organizar</button><button class="btn help" id="helpBtn" aria-label="Ajuda">?</button></div>
   </aside>
   <main class="decks n1" id="decks"></main>
 </div>
@@ -337,7 +376,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
       <div class="dlist" id="dlist"></div>
       <button class="btn x" id="dback" style="align-self:flex-start">‹ Outras fontes</button>
     </div>
-    <label class="keep"><input type="checkbox" id="keepCopy" checked><span>Guardar cópia neste iPad<small>Desligado: toca sem ocupar espaço, mas depois de recarregar você reconecta o arquivo com um toque.</small></span></label>
+    <label class="keep"><input type="checkbox" id="keepCopy" checked><span>Guardar cópia neste iPad<small>Desligado: toca direto do HD ou da nuvem sem ocupar espaço; ao reabrir o app, use Conectar músicas. Vale para o projeto inteiro.</small></span></label>
     <div class="btns"><span></span><button class="btn" id="addClose">Fechar</button></div>
   </div>
 </div>
@@ -348,14 +387,21 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <h3 id="projT">Projeto</h3>
     <div class="pcur"><b id="pName">Sem título</b><span id="pState"></span></div>
     <div class="pacts"><button class="btn on" id="pSave">Salvar</button><button class="btn" id="pSaveAs">Salvar como…</button><button class="btn" id="pNew">Novo</button></div>
-    <div class="dsearch" id="pAsRow" hidden><input class="num" type="text" id="pAsName" placeholder="Nome do projeto" style="font-family:var(--ui)"><button class="btn on" id="pAsOk">Salvar como</button></div>
+    <div id="pAsRow" hidden style="display:grid;grid-template-columns:1fr auto auto;gap:8px"><input class="num" type="text" id="pAsName" placeholder="Nome do projeto" style="font-family:var(--ui)"><button class="btn on" id="pAsIpad">No iPad</button><button class="btn on" id="pAsFile">Em arquivo (HD, nuvem)</button></div>
     <div class="seg" id="pTabs"><button data-v="recent" class="on">Abrir recentes</button><button data-v="all">Abrir… (todos)</button></div>
     <div class="plist" id="pList"></div>
-    <div class="btns"><div class="pfile"><button class="btn" id="pExport">Exportar arquivo</button><button class="btn" id="pImport">Importar arquivo</button></div><button class="btn" id="pClose">Fechar</button></div>
-    <p>Os projetos ficam guardados neste iPad. <b>Exportar arquivo</b> gera um .json com todos os ajustes (sem as músicas) para levar a outro aparelho; lá, importe o arquivo e depois as músicas com os mesmos nomes, que elas se reconectam sozinhas.</p>
+    <div class="pfile"><button class="btn" id="pImport">Abrir arquivo… (HD, nuvem)</button></div>
+    <div class="msec">
+      <h4>Músicas</h4>
+      <label class="keep"><input type="checkbox" id="keepAudio"><span>Guardar as músicas neste iPad<small>Desligado: as músicas não ocupam espaço no iPad. Ao abrir o show, toque em <b>Conectar músicas</b> e selecione todas de uma vez no HD, Dropbox ou Drive; o Lumia liga cada uma ao seu pad pelo nome.</small></span></label>
+      <div class="row"><button class="btn" id="pLink">Conectar músicas…</button><span class="muse" id="pUse"></span></div>
+    </div>
+    <div class="btns"><span></span><button class="btn" id="pClose">Fechar</button></div>
+    <p><b>No iPad</b>: o projeto fica guardado aqui (é pequeno, só os ajustes). <b>Em arquivo</b>: o Lumia gera um arquivo .lumia.json e abre o compartilhamento; escolha <b>Salvar em Arquivos</b> e o HD, Dropbox ou Drive. Para abrir de volta, use <b>Abrir arquivo…</b>.</p>
   </div>
 </div>
 <input type="file" id="projPicker" accept=".json,application/json" hidden>
+<input type="file" id="linkPicker" accept="audio/*,.mp3,.m4a,.aac,.wav,.aif,.aiff,.flac,.caf" multiple hidden>
 
 <!-- MIDI -->
 <div class="sheet" id="midi" hidden>
@@ -399,6 +445,8 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
       <li>Cada janela tem seu próprio <b>master</b> (slider J1, J2, J3 ao lado da grade). O som passa pelo master da janela e depois pelo master geral.</li>
       <li><b>Janelas 1, 2 ou 3</b>: grades lado a lado, cada uma com seu banco e seu cue. Um pad de uma janela toca por cima do pad de outra; dentro da mesma janela, só um toca por vez. A janela com borda roxa é a que o MIDI controla (a última que você tocou).</li>
       <li>Sliders: arraste para cima ou para baixo. Tocar sem arrastar não muda nada. Com teclado, <kbd>Esc</kbd> para tudo.</li>
+      <li><b>Time code</b>: no topo de cada janela aparecem a faixa tocando, o tempo decorrido e o que falta. Fica âmbar nos últimos 30 s e vermelho piscando nos últimos 10 s.</li>
+      <li><b>Organizar</b> (pé da coluna esquerda): toque num pad e depois no lugar para onde ele vai. Se o lugar estiver ocupado, os dois trocam. Dá para levar para outro banco (troque o banco antes do segundo toque) ou para outra janela.</li>
       <li><b>Offline</b>: depois de abrir uma vez com internet, o Lumia abre sem rede. No Safari, use Compartilhar › Adicionar à Tela de Início para abrir em tela cheia, como app.</li>
       <li><b>Projeto</b> (no topo da coluna esquerda): Salvar, Salvar como, Novo, Abrir e Abrir recentes. O ponto âmbar indica alterações não salvas. Com teclado, <kbd>⌘S</kbd> salva.</li>
       <li><b>nanoKONTROL2</b>: toque em MIDI, na coluna da esquerda, para ver o mapa dos botões.</li>
@@ -420,7 +468,7 @@ const fmt=s=>{if(!isFinite(s)||s<0)s=0;const m=Math.floor(s/60),r=s-m*60;return 
 const pct=v=>Math.round(v*100)+'%', secs=v=>(+v).toFixed(1)+'s', mult=v=>(+v).toFixed(2)+'x';
 
 let proj={id:null,name:'Sem título',createdAt:null,savedAt:null,savedHash:null};
-const S={pads:[],masterVolume:0.9,editing:null,nDecks:1,active:0,decks:[{bank:0,cue:null,vol:1},{bank:1,cue:null,vol:1},{bank:2,cue:null,vol:1}]};
+const S={keepAudio:true,arrange:false,pick:null,pads:[],masterVolume:0.9,editing:null,nDecks:1,active:0,decks:[{bank:0,cue:null,vol:1},{bank:1,cue:null,vol:1},{bank:2,cue:null,vol:1}]};
 const D=()=>S.decks[S.active];
 const padById=id=>S.pads.find(p=>p.id===id);
 const padAt=(b,s)=>S.pads.find(p=>p.bank===b&&p.slot===s);
@@ -445,7 +493,7 @@ function idbPut(store,key,val){if(!db)return Promise.resolve(false);return new P
 function idbGet(store,key){if(!db)return Promise.resolve(undefined);return new Promise(res=>{try{const r=db.transaction(store).objectStore(store).get(key);r.onsuccess=()=>res(r.result);r.onerror=()=>res(undefined)}catch(e){res(undefined)}})}
 function idbDel(store,key){if(!db)return Promise.resolve();return new Promise(res=>{try{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(key);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
 let saveT=null;
-function snapshot(){return {v:3,widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
+function snapshot(){return {v:3,keepAudio:S.keepAudio,widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
 function hashStr(t){let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36)+':'+t.length}
 function saveSoon(){clearTimeout(saveT);saveT=setTimeout(async()=>{
   const data=snapshot();data.project={id:proj.id,name:proj.name,createdAt:proj.createdAt,savedHash:proj.savedHash,savedAt:proj.savedAt};
@@ -616,8 +664,9 @@ async function relink(p){
 
 /* ---------- Add sheet ---------- */
 let addTarget=null;
-function openAdd(bank,slot){addTarget={bank,slot};$('#addPick').hidden=false;$('#addDrive').hidden=true;$('#add').hidden=false}
+function openAdd(bank,slot){addTarget={bank,slot};$('#keepCopy').checked=S.keepAudio;$('#addPick').hidden=false;$('#addDrive').hidden=true;$('#add').hidden=false}
 function closeAdd(){$('#add').hidden=true}
+$('#keepCopy').addEventListener('change',e=>setKeepAudio(e.target.checked));
 if(!(window.claude&&typeof window.claude.use==='function')){const d=$('#srcDrive');if(d){d.hidden=true;d.parentElement.style.gridTemplateColumns='1fr'}}
 $('#srcFiles').onclick=()=>{if(!addTarget)return;pickTarget={bank:addTarget.bank,slot:addTarget.slot,keep:$('#keepCopy').checked};closeAdd();const p=$('#picker');p.multiple=true;p.click()};
 $('#srcDrive').onclick=()=>{$('#addPick').hidden=true;$('#addDrive').hidden=false;driveSearch('')};
@@ -686,7 +735,7 @@ $('#dlist').addEventListener('click',async e=>{
 /* ---------- Pad grid ---------- */
 function padHTML(p,s){
   const out=p.outPoint>0?p.outPoint:p.duration,len=Math.max(0,out-(p.inPoint||0))/(p.speed||1);
-  return `<div class="pad ${p.missing?'missing':''}" role="button" tabindex="0" data-pad="${p.id}" style="--c:${p.color}">
+  return `<div class="pad ${p.missing?'missing':''} ${S.pick===p.id?'picked':''}" role="button" tabindex="0" data-pad="${p.id}" style="--c:${p.color}">
       <div class="prog" data-prog="${p.id}"></div><div class="tint"></div>
       <span class="pname">${esc(p.name)}</span><span class="cuetag">CUE</span>
       <button class="more" data-more="${p.id}" aria-label="Abrir controles do pad">⋯</button>
@@ -695,11 +744,11 @@ function padHTML(p,s){
         <span class="ptags">${p.stopMode==='fade'?'fade':''} <span>${s+1}</span></span></div></div>`}
 function renderGrid(){
   const box=$('#decks'),multi=S.nDecks>1;
-  box.className='decks n'+S.nDecks+(multi?' multi':'');
+  box.className='decks n'+S.nDecks+(multi?' multi':'')+(S.arrange?' arrange':'')+(S.pick?' picking':'');
   let h='';
   for(let d=0;d<S.nDecks;d++){
     const bank=S.decks[d].bank;
-    h+=`<section class="deck ${multi&&d===S.active?'active':''}" data-deck="${d}" aria-label="Janela ${d+1}"><div class="dvol"><label for="vs-dv${d}">J${d+1}</label>${vsHTML('dv'+d,{label:'Master da janela '+(d+1),icon:'vol',min:0,max:1,step:0.01,kstep:0.05,fmt:pct,get:()=>S.decks[d].vol,set:v=>setDeckVol(d,v)})}</div><div class="grid">`;
+    h+=`<section class="deck ${multi&&d===S.active?'active':''}" data-deck="${d}" aria-label="Janela ${d+1}"><div class="nowbar idle" data-now="${d}" aria-live="off"><div class="nprog"></div><span class="nname"><small>JANELA ${d+1}</small><b>Nada tocando</b></span><span class="nel"><small>DECORRIDO</small><i>0:00</i></span><span class="nrem"><small>FALTA</small><i>-0:00</i></span></div><div class="dvol"><label for="vs-dv${d}">J${d+1}</label>${vsHTML('dv'+d,{label:'Master da janela '+(d+1),icon:'vol',min:0,max:1,step:0.01,kstep:0.05,fmt:pct,get:()=>S.decks[d].vol,set:v=>setDeckVol(d,v)})}</div><div class="grid">`;
     for(let s=0;s<PADS_PER_BANK;s++){
       const p=padAt(bank,s);
       h+=p?padHTML(p,s):`<button class="pad empty" data-slot="${s}" aria-label="Adicionar música no pad ${BANK_NAMES[bank]}${s+1}"><span><b>+</b>${BANK_NAMES[bank]}${s+1}</span></button>`;
@@ -723,6 +772,7 @@ function paint(){
   const liveBanks=new Set();players.forEach(p=>{if(!p.stopping){const pad=padById(p.padId);if(pad)liveBanks.add(pad.bank)}});
   document.querySelectorAll('[data-bdot]').forEach(d=>{d.hidden=!liveBanks.has(+d.dataset.bdot)});
   document.querySelectorAll('#decks .deck').forEach(el=>el.classList.toggle('active',S.nDecks>1&&+el.dataset.deck===S.active));
+  paintLink();
   const ep=S.editing&&padById(S.editing),pb=$('#e-play');
   if(ep&&pb){const l=isLive(ep.id);pb.classList.toggle('live',l);pb.textContent=l?'Tocando':'▶ Play';$('#e-stopcut').disabled=!l;$('#e-stopfade').disabled=!l}
 }
@@ -739,6 +789,7 @@ const decks=$('#decks');
 const deckOf=el=>+el.closest('[data-deck]').dataset.deck;
 decks.addEventListener('pointerdown',e=>{
   const dk=e.target.closest('[data-deck]');if(dk)setActive(+dk.dataset.deck);
+  if(S.arrange)return;
   const el=e.target.closest('.pad[data-pad]');if(!el||e.target.closest('.more,.lp'))return;held=false;
   const x0=e.clientX,y0=e.clientY;clearTimeout(hold);
   hold=setTimeout(()=>{held=true;openEditor(el.dataset.pad)},500);
@@ -748,6 +799,7 @@ decks.addEventListener('pointerdown',e=>{
 decks.addEventListener('contextmenu',e=>{if(e.target.closest('.pad'))e.preventDefault()});
 decks.addEventListener('click',e=>{
   const bk=e.target.closest('[data-bank]');if(bk){setBank(+bk.dataset.bank,deckOf(bk));return}
+  if(S.arrange){arrangeClick(e);return}
   const more=e.target.closest('[data-more]');if(more){e.stopPropagation();openEditor(more.dataset.more);return}
   const lp=e.target.closest('[data-loop]');if(lp){e.stopPropagation();toggleLoop(padById(lp.dataset.loop));return}
   const empty=e.target.closest('.pad.empty');if(empty){const d=deckOf(empty);openAdd(S.decks[d].bank,+empty.dataset.slot);return}
@@ -789,6 +841,21 @@ $('#decks').addEventListener('pointerdown',e=>{
   sp.addEventListener('pointermove',mv);sp.addEventListener('pointerup',up);sp.addEventListener('pointercancel',up);
 },true);
 $('#decks').addEventListener('dblclick',e=>{if(!e.target.closest('.split'))return;if(S.widths)delete S.widths[S.nDecks];applyWidths();fitAll();saveSoon()});
+
+
+/* ---------- Organize: tap a pad, then tap where it goes (swap if occupied) ---------- */
+function setArrange(on){S.arrange=on;S.pick=null;const b=$('#arrBtn');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.textContent=on?'Pronto':'Organizar';
+  renderGrid();if(on)toast('Toque num pad e depois no lugar para onde ele vai. Toque em Pronto para voltar a tocar.')}
+function arrangeClick(e){
+  const padEl=e.target.closest('.pad[data-pad]'),empty=e.target.closest('.pad.empty');
+  if(padEl){const id=padEl.dataset.pad;
+    if(!S.pick)S.pick=id;
+    else if(S.pick===id)S.pick=null;
+    else{const a=padById(S.pick),b=padById(id);[a.bank,b.bank]=[b.bank,a.bank];[a.slot,b.slot]=[b.slot,a.slot];S.pick=null;saveSoon()}
+    renderGrid();return}
+  if(empty&&S.pick){const a=padById(S.pick),d=deckOf(empty);a.bank=S.decks[d].bank;a.slot=+empty.dataset.slot;S.pick=null;saveSoon();renderGrid()}
+}
+$('#arrBtn').onclick=()=>setArrange(!S.arrange);
 
 /* ---------- Loop toggle (pad button, window, MIDI) ---------- */
 function toggleLoop(p){if(!p)return;p.loop=!p.loop;paintLoop(p);saveSoon()}
@@ -835,7 +902,7 @@ function onMidi(ev){
   if(v<64){midiHeld.delete(n);return}
   if(midiHeld.has(n))return;midiHeld.add(n);
   let idx=-1;if(n>=32&&n<=39)idx=n-32;else if(n>=48&&n<=55)idx=8+n-48;else if(n>=64&&n<=71)idx=16+n-64;
-  if(idx>=0){const p=padAt(D().bank,idx);if(p)tap(p,S.active);return}
+  if(idx>=0){if(S.arrange)return;const p=padAt(D().bank,idx);if(p)tap(p,S.active);return}
   const live=()=>{for(const [id,pl] of players){if(!pl.stopping&&pl.deck===S.active)return padById(id)}return null};
   switch(n){
     case 41:{const p=D().cue&&padById(D().cue);if(p)play(p,S.active);break}
@@ -936,6 +1003,30 @@ ed.addEventListener('pointerdown',e=>{
 window.addEventListener('resize',()=>drawWave());
 
 /* ---------- UI loop ---------- */
+
+/* ---------- Now playing time code, one per window ---------- */
+function fmtS(s){if(!isFinite(s)||s<0)s=0;const m=Math.floor(s/60),r=Math.floor(s-m*60);return m+':'+(r<10?'0':'')+r}
+function paintNow(){
+  document.querySelectorAll('[data-now]').forEach(bar=>{
+    const d=+bar.dataset.now;let pl=null;
+    for(const x of players.values()){if(x.deck===d&&!x.stopping){pl=x;break}}
+    if(!pl)for(const x of players.values()){if(x.deck===d){pl=x;break}}
+    const nm=bar.querySelector('.nname b'),el=bar.querySelector('.nel i'),rm=bar.querySelector('.nrem i'),pr=bar.querySelector('.nprog');
+    let cls='idle';
+    if(pl){const p=padById(pl.padId);if(p){
+      const a=p.inPoint||0,out=p.outPoint>0?p.outPoint:(pl.el.duration||p.duration||0),ct=pl.el.currentTime,sp=p.speed||1;
+      const rem=Math.max(0,(out-ct)/sp),elp=Math.max(0,(ct-a)/sp);
+      if(nm.textContent!==p.name)nm.textContent=p.name;
+      el.textContent=fmtS(elp);rm.textContent=(p.loop?'↻ ':'-')+fmtS(rem);
+      pr.style.width=(Math.max(0,Math.min(1,(ct-a)/Math.max(0.01,out-a)))*100).toFixed(1)+'%';
+      cls=pl.stopping?'play':(!p.loop&&rem<=10?'crit':!p.loop&&rem<=30?'warn':'play')}}
+    else{const cue=S.decks[d].cue&&padById(S.decks[d].cue);pr.style.width='0';
+      if(cue){cls='cue';const t='CUE · '+cue.name;if(nm.textContent!==t)nm.textContent=t}
+      else if(nm.textContent!=='Nada tocando')nm.textContent='Nada tocando'}
+    const want='nowbar '+cls;if(bar.className!==want)bar.className=want;
+  });
+}
+
 let edWasLive=false;
 function frame(){
   players.forEach(pl=>{const p=padById(pl.padId);if(!p)return;
@@ -944,6 +1035,7 @@ function frame(){
     document.querySelectorAll(`[data-prog="${p.id}"]`).forEach(pr=>{pr.style.width=(q*100).toFixed(1)+'%'});
     const txt=p.loop?'loop':'-'+fmt((out-ct)/(p.speed||1));document.querySelectorAll(`[data-ptime="${p.id}"]`).forEach(t=>{t.textContent=txt});
   });
+  paintNow();
   const p=S.editing&&padById(S.editing);
   if(p&&!$('#ed').hidden){const pl=players.get(p.id);const live=!!(pl&&!pl.stopping);const ct=live?pl.el.currentTime:(p.inPoint||0);
     $('#e-ro').firstChild.nodeValue=fmt(ct);if(live)drawWave(ct);else if(edWasLive)drawWave();edWasLive=live}
@@ -994,6 +1086,35 @@ function migrate(old){const out=[];let slot=0;(old.tracks||[]).forEach((t,ti)=>{
   return out}
 
 
+
+/* ---------- Music storage: keep copies on the iPad, or link from HD / cloud each session ---------- */
+async function setKeepAudio(on){
+  S.keepAudio=on;$('#keepAudio').checked=on;$('#keepCopy').checked=on;
+  if(on){let n=0;for(const p of S.pads){const b=blobs.get(p.fileKey);if(b){p.keep=true;if(await idbPut('files',p.fileKey,b))n++}}if(n)toast(n+' música'+(n>1?'s guardadas':' guardada')+' no iPad.')}
+  else{for(const p of S.pads)p.keep=false;
+    // free space: drop stored copies that no project saved on the iPad still keeps
+    const keepSet=new Set();
+    for(const m of await listProjects()){if(m.id===proj.id||m.where==='file')continue;const d=await idbGet('kv','proj:'+m.id);if(d&&d.pads)d.pads.forEach(p=>{if(p.keep!==false&&d.keepAudio!==false)keepSet.add(p.fileKey)})}
+    for(const p of S.pads)if(!keepSet.has(p.fileKey))await idbDel('files',p.fileKey);
+    toast('As músicas deste projeto não ocupam mais espaço no iPad. Continuam tocando até você fechar o app.')}
+  saveSoon();paintUse();
+}
+async function paintUse(){const el=$('#pUse');if(!el)return;try{const e=await navigator.storage.estimate();el.textContent='O Lumia usa '+(e.usage/1e6).toFixed(0)+' MB neste iPad'}catch(_){el.textContent=''}}
+function paintLink(){const n=S.pads.filter(p=>p.missing).length,pill=$('#linkPill');pill.hidden=!n;pill.textContent='⚠ '+n+' faltando'}
+function openLink(){$('#linkPicker').click()}
+$('#linkPill').onclick=openLink;
+$('#linkPicker').addEventListener('change',async e=>{
+  const files=[...(e.target.files||[])].filter(isAudio);e.target.value='';if(!files.length)return;
+  const norm=t=>String(t||'').toLowerCase().replace(/\.[^.]+$/,'').trim();
+  let ok=0;
+  for(const p of S.pads){if(!p.missing&&blobs.has(p.fileKey))continue;
+    const f=files.find(x=>x.name===p.fileName)||files.find(x=>norm(x.name)===norm(p.fileName))||files.find(x=>norm(x.name)===norm(p.name));
+    if(f){await attach(p,f,S.keepAudio&&p.keep!==false);ok++}}
+  renderGrid();saveSoon();
+  const left=S.pads.filter(p=>p.missing);
+  toast(ok+' música'+(ok!==1?'s conectadas':' conectada')+(left.length?'. Ainda faltam: '+left.slice(0,3).map(p=>p.name).join(', ')+(left.length>3?'…':''):'. Tudo pronto.'));
+});
+
 /* ---------- Projects: save, save as, new, open, recent, export, import ---------- */
 function isDirty(){return !proj.savedHash||hashStr(JSON.stringify(snapshot()))!==proj.savedHash}
 function when(ts){if(!ts)return'';const d=new Date(ts);const p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes())}
@@ -1006,19 +1127,44 @@ function paintProj(){
 }
 async function listProjects(){const l=await idbGet('kv','projects');return Array.isArray(l)?l:[]}
 async function putMeta(meta){const l=await listProjects();const i=l.findIndex(x=>x.id===meta.id);if(i>=0)l[i]=meta;else l.push(meta);return idbPut('kv','projects',l)}
-async function saveProject(asName){
-  if(!db){toast('Este navegador não deixa guardar projetos. Use Exportar arquivo.');return false}
+async function saveFile(fname,body){
+  const dl=await getDownloads();
+  if(dl){try{await dl.save({filename:fname,data:body});return true}
+    catch(e){const c=e&&e.code;toast(c==='declined'?'Salvamento cancelado.':c==='rate_limited'?'Já existe um pedido aberto. Tente em instantes.':'Não foi possível salvar o arquivo aqui ('+(c||'erro')+').');return false}}
+  const file=new File([body],fname,{type:'application/json'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:fname});return true}
+    catch(e){if(e&&e.name==='AbortError'){toast('Salvamento cancelado.');return false}}}
+  try{const u=URL.createObjectURL(file);const a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}
+  catch(e){toast('Não foi possível salvar o arquivo aqui.');return false}
+}
+async function saveProjectFile(asName){
   const now=Date.now();
-  if(asName!=null||!proj.id){proj.id=uid();proj.createdAt=now;if(asName)proj.name=asName}
+  if(asName!=null||!proj.id||proj.where!=='file'){proj.id=uid();proj.createdAt=now;if(asName)proj.name=asName}
+  const data=snapshot();
+  const body=JSON.stringify({lumia:'ipad-project',v:3,name:proj.name,savedAt:new Date(now).toISOString(),data});
+  const fname=(proj.name||'projeto').replace(/[\\/:*?"<>|]+/g,'-').slice(0,80)+'.lumia.json';
+  if(!await saveFile(fname,body))return false;
+  proj.where='file';proj.savedHash=hashStr(JSON.stringify(data));proj.savedAt=now;
+  await putMeta({id:proj.id,name:proj.name,where:'file',fileName:fname,createdAt:proj.createdAt||now,updatedAt:now,openedAt:now,pads:data.pads.length});
+  saveSoon();paintProj();toast('Arquivo do projeto enviado: '+fname);if(!$('#proj').hidden)renderProjList();return true;
+}
+async function saveProject(asName,where){
+  where=where||(asName!=null?'ipad':(proj.where||'ipad'));
+  if(where==='file')return saveProjectFile(asName);
+  if(!db){toast('Este navegador não deixa guardar projetos aqui. Salve em arquivo.');return false}
+  const now=Date.now();
+  if(asName!=null||!proj.id||proj.where==='file'){proj.id=uid();proj.createdAt=now;if(asName)proj.name=asName}
+  proj.where='ipad';
   const data=snapshot();
   const ok=await idbPut('kv','proj:'+proj.id,data);if(!ok){toast('Não consegui salvar o projeto. O iPad pode estar sem espaço.');return false}
-  await putMeta({id:proj.id,name:proj.name,createdAt:proj.createdAt||now,updatedAt:now,openedAt:now,pads:data.pads.length});
-  proj.savedHash=hashStr(JSON.stringify(data));proj.savedAt=now;saveSoon();paintProj();toast('Projeto salvo: '+proj.name);
+  await putMeta({id:proj.id,name:proj.name,where:'ipad',createdAt:proj.createdAt||now,updatedAt:now,openedAt:now,pads:data.pads.length});
+  proj.savedHash=hashStr(JSON.stringify(data));proj.savedAt=now;saveSoon();paintProj();toast('Projeto salvo no iPad: '+proj.name);
   if(!$('#proj').hidden)renderProjList();return true;
 }
 async function loadState(st){
   S.pads=(st.pads||[]).map(p=>({stopMode:p.stopMode||(p.retrig==='stop'&&p.fadeOut>0?'fade':'cut'),...p}));
-  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};
+  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};S.keepAudio=st.keepAudio!==false;S.pick=null;
   S.decks.forEach((d,i)=>{d.cue=null;d.bank=i;d.vol=1});S.active=0;
   (st.banks||[st.bank||0,1,2]).forEach((b,i)=>{if(S.decks[i])S.decks[i].bank=Math.min(BANKS-1,b||0)});
   (st.deckVols||[]).forEach((v,i)=>{if(S.decks[i]&&isFinite(v))S.decks[i].vol=v});
@@ -1026,19 +1172,21 @@ async function loadState(st){
   if(master&&ctx)master.gain.setTargetAtTime(S.masterVolume,ctx.currentTime,0.02);
   S.decks.forEach((d,i)=>{if(deckGains[i]&&ctx)deckGains[i].gain.setTargetAtTime(d.vol,ctx.currentTime,0.02)});
 }
-function renderAll(){if(!$('#ed').hidden){$('#ed').hidden=true;S.editing=null}vsPaint('master');renderGrid();paintProj()}
+function renderAll(){if(!$('#ed').hidden){$('#ed').hidden=true;S.editing=null}vsPaint('master');renderGrid();paintProj();paintLink()}
 async function openProject(id){
   const data=await idbGet('kv','proj:'+id),l=await listProjects(),meta=l.find(x=>x.id===id);
   if(!data||!meta){toast('Projeto não encontrado neste iPad.');return}
   stopAll(0.05);await loadState(data);
   proj={id,name:meta.name,createdAt:meta.createdAt,savedAt:meta.updatedAt,savedHash:hashStr(JSON.stringify(snapshot()))};
   meta.openedAt=Date.now();await putMeta(meta);renderAll();saveSoon();closeProj();
-  const miss=S.pads.filter(p=>p.missing).length;toast('Aberto: '+meta.name+(miss?' · '+miss+' música'+(miss>1?'s':'')+' para reconectar':''));
+  const miss=S.pads.filter(p=>p.missing).length;toast('Aberto: '+meta.name+(miss?' · '+miss+' música'+(miss>1?'s':'')+' faltando: toque em ⚠ para conectar':''));
 }
 function newProject(){stopAll(0.05);S.pads=[];S.decks.forEach((d,i)=>{d.cue=null;d.bank=i});S.active=0;
   proj={id:null,name:'Sem título',createdAt:null,savedAt:null,savedHash:hashStr(JSON.stringify(snapshot()))};renderAll();saveSoon();closeProj();toast('Novo projeto.')}
 async function deleteProject(id){
-  const l=(await listProjects()).filter(x=>x.id!==id);await idbPut('kv','projects',l);
+  const all=await listProjects(),m=all.find(x=>x.id===id);
+  if(m&&m.where==='file'){await idbPut('kv','projects',all.filter(x=>x.id!==id));renderProjList();return}
+  const l=all.filter(x=>x.id!==id);await idbPut('kv','projects',l);
   const data=await idbGet('kv','proj:'+id);await idbDel('kv','proj:'+id);
   if(proj.id===id){proj.id=null;proj.savedHash=null;proj.savedAt=null;saveSoon()}
   if(data&&data.pads)gcFiles(data.pads.map(p=>p.fileKey));renderProjList();
@@ -1054,10 +1202,10 @@ async function renderProjList(){
   let l=await listProjects();const box=$('#pList');
   if(projTab==='recent'){l=l.sort((a,b)=>(b.openedAt||0)-(a.openedAt||0)).slice(0,6)}else{l=l.sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'))}
   if(!l.length){box.innerHTML='<div class="pempty">Nenhum projeto salvo ainda. Toque em Salvar para guardar este.</div>';return}
-  box.innerHTML=l.map(m=>`<div class="prow ${m.id===proj.id?'cur':''}"><div><b>${esc(m.name)}</b><span>${m.id===proj.id?'aberto · ':''}salvo ${when(m.updatedAt)} · ${m.pads||0} pads</span></div>
-    <button class="btn ${m.id===proj.id?'':'on'}" data-open="${m.id}">${m.id===proj.id?'Reabrir':'Abrir'}</button><button class="btn x" data-delp="${m.id}" aria-label="Apagar projeto ${esc(m.name)}">✕</button></div>`).join('');
+  box.innerHTML=l.map(m=>{const f=m.where==='file';return `<div class="prow ${m.id===proj.id?'cur':''}"><div><b>${esc(m.name)}</b><span>${m.id===proj.id?'aberto · ':''}${f?'arquivo (HD/nuvem)':'no iPad'} · ${when(m.updatedAt)} · ${m.pads||0} pads</span></div>
+    <button class="btn ${m.id===proj.id?'':'on'}" ${f?'data-openfile="1"':`data-open="${m.id}"`}>${f?'Abrir arquivo…':(m.id===proj.id?'Reabrir':'Abrir')}</button><button class="btn x" data-delp="${m.id}" aria-label="${f?'Tirar da lista':'Apagar projeto'} ${esc(m.name)}">✕</button></div>`}).join('');
 }
-function openProj(){paintProj();$('#pAsRow').hidden=true;segSet('#pTabs',projTab);renderProjList();$('#proj').hidden=false}
+function openProj(){paintProj();paintUse();$('#keepAudio').checked=S.keepAudio;$('#pAsRow').hidden=true;segSet('#pTabs',projTab);renderProjList();$('#proj').hidden=false}
 function closeProj(){$('#proj').hidden=true}
 $('#projBtn').onclick=openProj;
 $('#pClose').onclick=closeProj;
@@ -1066,33 +1214,29 @@ $('#proj').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='pSave'){saveProject();return}
   if(b.id==='pSaveAs'){const r=$('#pAsRow');r.hidden=!r.hidden;if(!r.hidden){const i=$('#pAsName');i.value=proj.id?proj.name+' (cópia)':(proj.name==='Sem título'?'':proj.name);i.focus()}return}
-  if(b.id==='pAsOk'){const n=$('#pAsName').value.trim();if(!n){toast('Dê um nome ao projeto.');return}saveProject(n).then(ok=>{if(ok)$('#pAsRow').hidden=true});return}
+  if(b.id==='pAsIpad'||b.id==='pAsFile'){const n=$('#pAsName').value.trim();if(!n){toast('Dê um nome ao projeto.');return}saveProject(n,b.id==='pAsFile'?'file':'ipad').then(ok=>{if(ok)$('#pAsRow').hidden=true});return}
+  if(b.dataset.openfile){if(isDirty()&&S.pads.length)armed(b,()=>$('#projPicker').click(),'Descartar alterações?');else $('#projPicker').click();return}
+  if(b.id==='pLink'){openLink();return}
   if(b.id==='pNew'){if(isDirty()&&S.pads.length)armed(b,newProject,'Descartar?');else newProject();return}
   if(b.closest('#pTabs')){projTab=b.dataset.v;segSet('#pTabs',projTab);renderProjList();return}
   if(b.dataset.open){const id=b.dataset.open;if(isDirty()&&S.pads.length)armed(b,()=>openProject(id),'Descartar alterações?');else openProject(id);return}
   if(b.dataset.delp){const id=b.dataset.delp;armed(b,()=>deleteProject(id),'Apagar?');return}
-  if(b.id==='pExport'){exportProject();return}
   if(b.id==='pImport'){$('#projPicker').click();return}
 });
-$('#pAsName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#pAsOk').click()}});
+$('#pAsName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#pAsIpad').click()}});
+$('#keepAudio').addEventListener('change',e=>setKeepAudio(e.target.checked));
 let dlP=null;
 function getDownloads(){if(!dlP)dlP=(window.claude&&typeof window.claude.use==='function')?window.claude.use('downloads').catch(()=>null):Promise.resolve(null);return dlP}
-async function exportProject(){
-  const dl=await getDownloads();
-  const body=JSON.stringify({lumia:'ipad-project',v:3,name:proj.name,exportedAt:new Date().toISOString(),data:snapshot()});
-  const fname=(proj.name||'projeto').replace(/[\\/:*?"<>|]+/g,'-').slice(0,80)+'.lumia.json';
-  if(!dl){try{const u=URL.createObjectURL(new Blob([body],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('Arquivo exportado: '+fname)}catch(e){toast('Não foi possível exportar aqui.')}return}
-  try{await dl.save({filename:fname,data:body});toast('Arquivo exportado: '+fname)}
-  catch(e){const c=e&&e.code;toast(c==='declined'?'Exportação cancelada.':c==='rate_limited'?'Já existe um pedido de download aberto. Tente em instantes.':'Não foi possível exportar aqui ('+(c||'erro')+').')}
-}
 $('#projPicker').addEventListener('change',async e=>{
   const file=(e.target.files||[])[0];e.target.value='';if(!file)return;
   let obj;try{obj=JSON.parse(await file.text())}catch(_){toast('Esse arquivo não é um projeto do Lumia.');return}
   if(!obj||obj.lumia!=='ipad-project'||!obj.data||!Array.isArray(obj.data.pads)){toast('Esse arquivo não é um projeto do Lumia.');return}
   stopAll(0.05);await loadState(obj.data);
-  proj={id:null,name:(obj.name||file.name.replace(/\.lumia\.json$|\.json$/i,'')),createdAt:null,savedAt:null,savedHash:null};
-  renderAll();await saveProject(proj.name);closeProj();
-  const miss=S.pads.filter(p=>p.missing).length;if(miss)setTimeout(()=>toast(miss+' música'+(miss>1?'s':'')+' para reconectar: importe os arquivos pelos pads vazios ou pelo toque no pad apagado.'),1600);
+  const now=Date.now();
+  proj={id:uid(),where:'file',name:(obj.name||file.name.replace(/\.lumia\.json$|\.json$/i,'')),createdAt:now,savedAt:now,savedHash:hashStr(JSON.stringify(snapshot()))};
+  await putMeta({id:proj.id,name:proj.name,where:'file',fileName:file.name,createdAt:now,updatedAt:now,openedAt:now,pads:S.pads.length});
+  renderAll();saveSoon();closeProj();toast('Aberto do arquivo: '+proj.name);
+  const miss=S.pads.filter(p=>p.missing).length;if(miss)setTimeout(()=>toast(miss+' música'+(miss>1?'s':'')+' faltando: toque em ⚠ na coluna esquerda e selecione as músicas no HD ou na nuvem.'),1600);
 });
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();if(e.shiftKey){openProj();$('#pSaveAs').click()}else saveProject()}});
 
@@ -1107,7 +1251,7 @@ document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLower
     await loadState(st);if(st.project)proj=Object.assign(proj,st.project);
     saveSoon();
   }else{try{await makeExamples()}catch(e){}}
-  vsPaint('master');renderGrid();paintProj();paintAudio();requestAnimationFrame(frame);midiInit();
+  vsPaint('master');renderGrid();paintProj();paintLink();paintAudio();requestAnimationFrame(frame);midiInit();
 })();
 })();
 </script>
