@@ -132,7 +132,8 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 .decks.multi .nowbar .nrem{font-size:21px}
 .decks.multi .nowbar .nel{font-size:12px}
 .deck.tiny .nowbar .nel{display:none}
-.pad[data-pad]{touch-action:none}
+.pad[data-pad]{touch-action:pan-y}
+.pad.lift{transform:scale(1.04);box-shadow:0 10px 26px rgba(0,0,0,.55)!important;z-index:3}
 .ghost{position:fixed;z-index:45;pointer-events:none;opacity:.9;transform:scale(1.06) rotate(-1.5deg);box-shadow:0 18px 40px rgba(0,0,0,.6);transition:none}
 .pad.dragsrc{opacity:.3}
 .pad.dropto{outline:3px solid var(--accent)!important;outline-offset:1px}
@@ -161,7 +162,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 .decks.multi .deck{grid-template-columns:minmax(0,1fr) 42px}
 .decks.multi .deck{padding:6px;border:1px solid var(--line);gap:6px}
 .decks.multi .deck.active{border-color:var(--accent)}
-.grid{--gc:6;--gr:4;display:grid;grid-template-columns:repeat(var(--gc),minmax(0,1fr));grid-template-rows:repeat(var(--gr),minmax(0,1fr));gap:10px;min-height:0}
+.grid{--gc:6;--gr:4;--rh:1fr;display:grid;grid-template-columns:repeat(var(--gc),minmax(0,1fr));grid-auto-rows:var(--rh);gap:10px;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;scrollbar-width:thin}
 .decks.multi .grid{gap:6px}
 .decks.multi .banks{grid-template-columns:auto repeat(6,1fr);gap:4px}
 .decks.multi .bank{min-height:44px;font-size:13px;padding:0;border-radius:12px}
@@ -425,7 +426,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <h3 id="midiT">nanoKONTROL2</h3>
     <div class="midi-state" id="midiState">Verificando MIDI…</div>
     <div style="overflow-x:auto"><table class="midi-t">
-      <tr><th>S · M · R (1 a 8)</th><td>Os 24 botões são os 24 pads do banco da janela ativa (borda roxa): S = pads 1 a 8, M = 9 a 16, R = 17 a 24. Mesmo ciclo do toque: cue, play, stop.</td></tr>
+      <tr><th>S · M · R (1 a 8)</th><td>Os 24 botões são os 24 primeiros pads do banco da janela ativa (borda roxa): S = pads 1 a 8, M = 9 a 16, R = 17 a 24. Mesmo ciclo do toque: cue, play, stop.</td></tr>
       <tr><th>▶ PLAY</th><td>Play no pad em cue</td></tr>
       <tr><th>■ STOP</th><td>Stop seco no pad tocando</td></tr>
       <tr><th>◀◀</th><td>Stop com fade out no pad tocando</td></tr>
@@ -456,13 +457,13 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
       <li>Tocar em outro pad para o que está tocando e coloca o novo em CUE. Cada pad escolhe se esse stop é seco ou com fade out.</li>
       <li><b>LOOP</b> no próprio pad liga e desliga a repetição, mesmo com a música tocando.</li>
       <li>Janela do pad: toque no <b>⋯</b> ou segure o pad por meio segundo. Lá ficam Play, Stop, Stop com fade, volume, fades, velocidade, IN/OUT, loop, tipo de stop e cor.</li>
-      <li>São 6 bancos (A a F) de 24 pads. O ponto verde no banco indica que tem algo tocando lá.</li>
+      <li>São 6 bancos (A a F). Cada banco começa com 24 pads e cresce quando você adiciona mais músicas; role a janela com o dedo para ver o resto. O ponto verde no banco indica que tem algo tocando lá.</li>
       <li>Arraste a <b>divisória</b> entre as janelas para mudar a largura; os pads se reorganizam sozinhos. Toque duas vezes na divisória para voltar a larguras iguais.</li>
       <li>Cada janela tem seu próprio <b>master</b> (slider J1, J2, J3 ao lado da grade). O som passa pelo master da janela e depois pelo master geral.</li>
       <li><b>Janelas 1, 2 ou 3</b>: grades lado a lado, cada uma com seu banco e seu cue. Um pad de uma janela toca por cima do pad de outra; dentro da mesma janela, só um toca por vez. A janela com borda roxa é a que o MIDI controla (a última que você tocou).</li>
       <li>Sliders: arraste para cima ou para baixo. Tocar sem arrastar não muda nada. Com teclado, <kbd>Esc</kbd> para tudo.</li>
       <li><b>Time code</b>: no topo de cada janela aparecem a faixa tocando, o tempo decorrido e o que falta. Fica âmbar nos últimos 30 s e vermelho piscando nos últimos 10 s.</li>
-      <li><b>Reordenar</b>: encoste num pad e arraste. Solte num espaço vazio, ou em cima de outro pad: ele entra ali e os seguintes andam uma casa para a direita. Para levar a outro banco, pare o dedo meio segundo sobre o botão do banco. Dá para soltar em outra janela. <b>Travar</b> (pé da coluna esquerda) impede arrastar sem querer no show.</li>
+      <li><b>Reordenar</b>: segure o pad um instante (ele levanta) e arraste. Deslizar o dedo sem segurar só rola a janela. Solte num espaço vazio, ou em cima de outro pad: ele entra ali e os seguintes andam uma casa para a direita. Para levar a outro banco, pare o dedo meio segundo sobre o botão do banco. Dá para soltar em outra janela. <b>Travar</b> (pé da coluna esquerda) impede arrastar sem querer no show.</li>
       <li><b>Offline</b>: depois de abrir uma vez com internet, o Lumia abre sem rede. No Safari, use Compartilhar › Adicionar à Tela de Início para abrir em tela cheia, como app.</li>
       <li><b>Projeto</b> (no topo da coluna esquerda): Salvar, Salvar como, Novo, Abrir e Abrir recentes. O ponto âmbar indica alterações não salvas. Com teclado, <kbd>⌘S</kbd> salva.</li>
       <li><b>nanoKONTROL2</b>: toque em MIDI, na coluna da esquerda, para ver o mapa dos botões.</li>
@@ -476,7 +477,8 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 <script>
 (()=>{
 const $=s=>document.querySelector(s);
-const PADS_PER_BANK=24, BANKS=6, BANK_NAMES='ABCDEF';
+const PADS_PER_BANK=24, BANKS=6, BANK_NAMES='ABCDEF', SLOT_MAX=9999;
+const bankSlots=b=>{let m=-1;for(const p of S.pads)if(p.bank===b&&p.slot>m)m=p.slot;return Math.max(PADS_PER_BANK,Math.ceil((m+2)/PADS_PER_BANK)*PADS_PER_BANK)};
 const COLORS=['#3fd08f','#44b8d6','#9a8bff','#f2b33d','#ff7d5c','#e56fd2','#a4a7b3'];
 const uid=()=>Math.random().toString(36).slice(2,10);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -633,7 +635,7 @@ function peaksOf(buf,n=300){const d=buf.getChannelData(0),step=Math.max(1,Math.f
   for(let i=0;i<n;i++){let m=0;const s=i*step,e=Math.min(d.length,s+step);for(let j=s;j<e;j+=16){const v=Math.abs(d[j]);if(v>m)m=v}out.push(+m.toFixed(3))}return out}
 function newPad(bank,slot,name,fileKey,meta){return{id:uid(),bank,slot,name,fileKey,color:COLORS[0],volume:1,fadeIn:0,fadeOut:0,xfTime:1.5,speed:1,loop:false,stopMode:'cut',startMode:'cue',inPoint:0,outPoint:0,duration:meta.duration||0,peaks:meta.peaks}}
 const isAudio=f=>(f.type||'').startsWith('audio')||/\.(mp3|m4a|aac|wav|aiff?|flac|caf|ogg|opus)$/i.test(f.name||'');
-function nextFree(bank,slot){for(let i=bank*PADS_PER_BANK+slot;i<BANKS*PADS_PER_BANK;i++){const b=Math.floor(i/PADS_PER_BANK),s=i%PADS_PER_BANK;if(!padAt(b,s))return[b,s]}return null}
+function nextFree(bank,slot){for(let s=slot;s<SLOT_MAX;s++){if(!padAt(bank,s))return[bank,s]}return null}
 async function attach(p,blob,keep,recalc){
   const u=urls.get(p.fileKey);if(u){URL.revokeObjectURL(u);urls.delete(p.fileKey)}
   blobs.set(p.fileKey,blob);p.missing=false;p.keep=keep!==false;
@@ -641,7 +643,7 @@ async function attach(p,blob,keep,recalc){
   if(recalc||!p.duration){const m=await analyse(blob);p.duration=m.duration;p.peaks=m.peaks;p.inPoint=Math.min(p.inPoint||0,m.duration);if(p.outPoint>m.duration)p.outPoint=0}
 }
 async function addBlob(bank,slot,blob,name,fileName,keep,extra){
-  const pos=nextFree(bank,slot);if(!pos){toast('Todos os 144 pads estão ocupados.');return null}
+  const pos=nextFree(bank,slot);if(!pos){toast('Banco cheio.');return null}
   const meta=await analyse(blob);
   const p=Object.assign(newPad(pos[0],pos[1],name,uid(),meta),{fileName},extra||{});
   await attach(p,blob,keep);S.pads.push(p);renderGrid();saveSoon();return pos;
@@ -655,7 +657,7 @@ async function importFiles(bank,slot,files,keep=true){
     const m=S.pads.find(p=>p.missing&&p.fileName===f.name);
     if(m){await attach(m,f,keep);relinked++;continue}
     const r=await addBlob(pos[0],pos[1],f,f.name.replace(/\.[^.]+$/,''),f.name,keep);if(!r)break;
-    added++;pos=[r[0],r[1]+1];if(pos[1]>=PADS_PER_BANK)pos=[pos[0]+1,0];if(pos[0]>=BANKS)break;
+    added++;pos=[r[0],r[1]+1];
   }
   renderGrid();saveSoon();
   toast([added?added+(added>1?' pads preenchidos':' pad preenchido'):'',relinked?relinked+' reconectado'+(relinked>1?'s':''):''].filter(Boolean).join(', ')+'.');
@@ -765,7 +767,8 @@ function renderGrid(){
   for(let d=0;d<S.nDecks;d++){
     const bank=S.decks[d].bank;
     h+=`<section class="deck ${multi&&d===S.active?'active':''}" data-deck="${d}" aria-label="Janela ${d+1}"><div class="nowbar idle" data-now="${d}" aria-live="off"><div class="nprog"></div><span class="nname"><small>JANELA ${d+1}</small><b>Nada tocando</b></span><span class="nel"><small>DECORRIDO</small><i>0:00</i></span><span class="nrem"><small>FALTA</small><i>-0:00</i></span></div><div class="dvol"><label for="vs-dv${d}">J${d+1}</label>${vsHTML('dv'+d,{label:'Master da janela '+(d+1),icon:'vol',min:0,max:1,step:0.01,kstep:0.05,fmt:pct,get:()=>S.decks[d].vol,set:v=>setDeckVol(d,v)})}</div><div class="grid">`;
-    for(let s=0;s<PADS_PER_BANK;s++){
+    const n=bankSlots(bank);
+    for(let s=0;s<n;s++){
       const p=padAt(bank,s);
       h+=p?padHTML(p,s):`<button class="pad empty" data-slot="${s}" aria-label="Adicionar música no pad ${BANK_NAMES[bank]}${s+1}"><span><b>+</b>${BANK_NAMES[bank]}${s+1}</span></button>`;
     }
@@ -800,7 +803,9 @@ function setWins(n){n=Math.max(1,Math.min(3,n));if(n===S.nDecks)return;
 $('#wins').addEventListener('click',e=>{const b=e.target.closest('[data-win]');if(b)setWins(+b.dataset.win)});
 
 // Tap = cue/play/stop. Hold 0.5 s or tap ⋯ = open the pad window.
-let hold=null,held=false;
+let hold=null,held=false,dragArmed=false;
+// once a pad is lifted for dragging, stop the window from scrolling under the finger
+document.addEventListener('touchmove',e=>{if(dragArmed||drag)e.preventDefault()},{passive:false});
 const decks=$('#decks');
 const deckOf=el=>+el.closest('[data-deck]').dataset.deck;
 decks.addEventListener('pointerdown',e=>{
@@ -808,10 +813,13 @@ decks.addEventListener('pointerdown',e=>{
   if(S.arrange)return;
   const el=e.target.closest('.pad[data-pad]');if(!el||e.target.closest('.more,.lp'))return;held=false;
   const x0=e.clientX,y0=e.clientY;clearTimeout(hold);
-  hold=setTimeout(()=>{held=true;openEditor(el.dataset.pad)},500);
-  const off=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up)};
-  const mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<12)return;clearTimeout(hold);off();
-    if(!S.lockDrag&&!held)startDrag(el,e,ev)};
+  const touch=e.pointerType!=='mouse';let armed=!touch,armT=null;
+  if(touch&&!S.lockDrag)armT=setTimeout(()=>{armed=true;dragArmed=true;el.classList.add('lift')},250);
+  hold=setTimeout(()=>{held=true;el.classList.remove('lift');dragArmed=false;openEditor(el.dataset.pad)},600);
+  const off=()=>{clearTimeout(armT);dragArmed=false;el.classList.remove('lift');document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up)};
+  const mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<12)return;clearTimeout(hold);
+    if(!armed){off();return}           // finger moved before the hold: it's a scroll
+    off();if(!S.lockDrag&&!held)startDrag(el,e,ev)};
   const up=()=>{clearTimeout(hold);off()};
   document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);
 });
@@ -843,7 +851,7 @@ function fitGrid(g){const w=g.clientWidth,h=g.clientHeight;if(!w||!h)return;
   let best=null,score=1e9;for(const [c,r] of SHAPES){const pw=(w-(c-1)*8)/c,ph=(h-(r-1)*8)/r;if(pw<54||ph<46)continue;
     const sc=Math.abs(Math.log((pw/ph)/1.25));if(sc<score){score=sc;best=[c,r,pw,ph]}}
   if(!best){const c=2,r=12;best=[c,r,(w-8)/2,(h-88)/12]}
-  g.style.setProperty('--gc',best[0]);g.style.setProperty('--gr',best[1]);
+  g.style.setProperty('--gc',best[0]);g.style.setProperty('--gr',best[1]);g.style.setProperty('--rh',Math.floor(best[3])+'px');
   const dk=g.closest('.deck');dk.classList.toggle('dense',best[2]<150||best[3]<110);dk.classList.toggle('tiny',best[2]<96||best[3]<70)}
 const ro=('ResizeObserver' in window)?new ResizeObserver(es=>es.forEach(e=>fitGrid(e.target))):null;
 function fitAll(){document.querySelectorAll('#decks .grid').forEach(g=>{fitGrid(g);if(ro)ro.observe(g)})}
@@ -875,6 +883,7 @@ function startDrag(el,e0,ev){
 }
 function moveGhost(x,y){drag.g.style.left=(x-drag.dx)+'px';drag.g.style.top=(y-drag.dy)+'px'}
 function dragMove(ev){if(!drag)return;ev.preventDefault();moveGhost(ev.clientX,ev.clientY);
+  const gr=document.elementFromPoint(ev.clientX,ev.clientY);const gg=gr&&gr.closest('#decks .grid');if(gg){const r=gg.getBoundingClientRect();if(ev.clientY<r.top+40)gg.scrollTop-=18;else if(ev.clientY>r.bottom-40)gg.scrollTop+=18}
   const hit=document.elementFromPoint(ev.clientX,ev.clientY);
   const t=hit&&hit.closest('#decks .pad'),bk=hit&&hit.closest('#decks [data-bank]');
   if(drag.over!==t){if(drag.over)drag.over.classList.remove('dropto');drag.over=t;if(t&&t.dataset.pad!==drag.id)t.classList.add('dropto')}
@@ -893,12 +902,11 @@ function dragEnd(ev){if(!drag)return;const id=drag.id;const hit=document.element
   movePad(id,bank,slot);renderGrid();saveSoon();
 }
 function movePad(id,bank,slot){
-  const p=padById(id);if(!p)return;const N=BANKS*PADS_PER_BANK,to=bank*PADS_PER_BANK+slot;
-  if(p.bank*PADS_PER_BANK+p.slot===to)return;
-  const occ=new Map(S.pads.filter(x=>x!==p).map(x=>[x.bank*PADS_PER_BANK+x.slot,x]));
-  if(occ.has(to)){let i=to;const chain=[];while(i<N&&occ.has(i)){chain.push(occ.get(i));i++}
-    if(i>=N){toast('Não há espaço livre depois dessa posição para deslocar os pads.');return}
-    for(let k=chain.length-1;k>=0;k--){const n=to+k+1;chain[k].bank=Math.floor(n/PADS_PER_BANK);chain[k].slot=n%PADS_PER_BANK}}
+  const p=padById(id);if(!p)return;
+  if(p.bank===bank&&p.slot===slot)return;
+  const occ=new Map(S.pads.filter(x=>x!==p&&x.bank===bank).map(x=>[x.slot,x]));
+  if(occ.has(slot)){let i=slot;const chain=[];while(occ.has(i)){chain.push(occ.get(i));i++}
+    for(let k=chain.length-1;k>=0;k--)chain[k].slot=slot+k+1}
   p.bank=bank;p.slot=slot;
 }
 function setLock(on){S.lockDrag=on;const b=$('#arrBtn');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.textContent=on?'🔒 Travado':'Travar';saveSoon()}
@@ -977,7 +985,7 @@ function onMidi(ev){
   }
 }
 function moveCue(dir){
-  const list=[...S.pads].filter(p=>!p.missing).sort((a,b)=>(a.bank*PADS_PER_BANK+a.slot)-(b.bank*PADS_PER_BANK+b.slot));if(!list.length)return;
+  const list=[...S.pads].filter(p=>!p.missing).sort((a,b)=>(a.bank-b.bank)||(a.slot-b.slot));if(!list.length)return;
   const ref=D().cue?padById(D().cue):focusPad();let i=ref?list.indexOf(ref):-1;
   i=i<0?(dir>0?0:list.length-1):Math.max(0,Math.min(list.length-1,i+dir));
   const p=list[i];D().cue=p.id;if(p.bank!==D().bank)setBank(p.bank);else paint();

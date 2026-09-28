@@ -8,7 +8,7 @@ Pads de áudio para palco no iPad, derivado do Lumia Pro v5. Um arquivo HTML, se
 3. Depois de abrir uma vez com internet, funciona offline.
 
 ## O que faz
-- Até 3 janelas de pads redimensionáveis, 6 bancos de 24 pads, master por janela e master geral.
+- Até 3 janelas de pads redimensionáveis, 6 bancos sem limite de pads (a janela rola), master por janela e master geral.
 - Toque: 1º cue, 2º play, 3º stop, ou por pad "toca direto" no 1º toque. Outro pad na mesma janela para o atual.
 - Loop ON/OFF por pad, stop seco ou com fade, fade in/out, velocidade, IN/OUT.
 - Time code da faixa em cada janela: decorrido e restante, âmbar nos últimos 30 s e vermelho nos últimos 10 s.
