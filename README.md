@@ -12,7 +12,7 @@ Pads de áudio para palco no iPad, derivado do Lumia Pro v5. Um arquivo HTML, se
 - Toque: 1º cue, 2º play, 3º stop, ou por pad "toca direto" no 1º toque. Outro pad na mesma janela para o atual.
 - Loop ON/OFF por pad, stop seco ou com fade, fade in/out, velocidade, IN/OUT.
 - Time code da faixa em cada janela: decorrido e restante, âmbar nos últimos 30 s e vermelho nos últimos 10 s.
-- Organizar: reordena pads entre posições, bancos e janelas.
+- Arrastar para reordenar: soltar sobre um pad insere e desloca os seguintes para a direita. Botão Travar evita arrasto acidental.
 - Projetos: salvar no iPad ou em arquivo `.lumia.json` (HD, Dropbox, Drive pelo app Arquivos), salvar como, abrir, recentes.
 - Músicas pelo app Arquivos (iPad, HD, iCloud, Dropbox, Google Drive). Opcional: não guardar no iPad e conectar as músicas a cada sessão, selecionando todas de uma vez.
 

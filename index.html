@@ -132,6 +132,12 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 .decks.multi .nowbar .nrem{font-size:21px}
 .decks.multi .nowbar .nel{font-size:12px}
 .deck.tiny .nowbar .nel{display:none}
+.pad[data-pad]{touch-action:none}
+.ghost{position:fixed;z-index:45;pointer-events:none;opacity:.9;transform:scale(1.06) rotate(-1.5deg);box-shadow:0 18px 40px rgba(0,0,0,.6);transition:none}
+.pad.dragsrc{opacity:.3}
+.pad.dropto{outline:3px solid var(--accent)!important;outline-offset:1px}
+.pad[data-pad].dropto{box-shadow:inset 6px 0 0 var(--accent)}
+.bank.dropto{border-color:var(--accent);color:var(--accent)}
 .decks.arrange .pad[data-pad]{outline:1px dashed var(--line2);outline-offset:-4px}
 .pad.picked{outline:3px solid var(--accent)!important;outline-offset:1px!important;transform:scale(.96)}
 .decks.picking .pad.empty{border-color:var(--accent);color:var(--accent)}
@@ -324,7 +330,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <div class="mwrap" id="masterBox"></div>
     <div class="status"><span class="pill warn" id="audioPill">Som: toque</span><span class="pill" id="storePill">…</span><button class="pill warn" id="midiPill" title="Controlador MIDI">MIDI –</button><button class="pill link" id="linkPill" hidden title="Conectar as músicas deste projeto">⚠ faltando</button></div>
     <div class="sep" aria-hidden="true"></div>
-    <div class="railfoot"><button class="btn arr" id="arrBtn" aria-pressed="false" title="Reordenar os pads">Organizar</button><button class="btn help" id="helpBtn" aria-label="Ajuda">?</button></div>
+    <div class="railfoot"><button class="btn arr" id="arrBtn" aria-pressed="false" title="Travar a posição dos pads para não arrastar sem querer">Travar</button><button class="btn help" id="helpBtn" aria-label="Ajuda">?</button></div>
   </aside>
   <main class="decks n1" id="decks"></main>
 </div>
@@ -456,7 +462,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
       <li><b>Janelas 1, 2 ou 3</b>: grades lado a lado, cada uma com seu banco e seu cue. Um pad de uma janela toca por cima do pad de outra; dentro da mesma janela, só um toca por vez. A janela com borda roxa é a que o MIDI controla (a última que você tocou).</li>
       <li>Sliders: arraste para cima ou para baixo. Tocar sem arrastar não muda nada. Com teclado, <kbd>Esc</kbd> para tudo.</li>
       <li><b>Time code</b>: no topo de cada janela aparecem a faixa tocando, o tempo decorrido e o que falta. Fica âmbar nos últimos 30 s e vermelho piscando nos últimos 10 s.</li>
-      <li><b>Organizar</b> (pé da coluna esquerda): toque num pad e depois no lugar para onde ele vai. Se o lugar estiver ocupado, os dois trocam. Dá para levar para outro banco (troque o banco antes do segundo toque) ou para outra janela.</li>
+      <li><b>Reordenar</b>: encoste num pad e arraste. Solte num espaço vazio, ou em cima de outro pad: ele entra ali e os seguintes andam uma casa para a direita. Para levar a outro banco, pare o dedo meio segundo sobre o botão do banco. Dá para soltar em outra janela. <b>Travar</b> (pé da coluna esquerda) impede arrastar sem querer no show.</li>
       <li><b>Offline</b>: depois de abrir uma vez com internet, o Lumia abre sem rede. No Safari, use Compartilhar › Adicionar à Tela de Início para abrir em tela cheia, como app.</li>
       <li><b>Projeto</b> (no topo da coluna esquerda): Salvar, Salvar como, Novo, Abrir e Abrir recentes. O ponto âmbar indica alterações não salvas. Com teclado, <kbd>⌘S</kbd> salva.</li>
       <li><b>nanoKONTROL2</b>: toque em MIDI, na coluna da esquerda, para ver o mapa dos botões.</li>
@@ -503,7 +509,7 @@ function idbPut(store,key,val){if(!db)return Promise.resolve(false);return new P
 function idbGet(store,key){if(!db)return Promise.resolve(undefined);return new Promise(res=>{try{const r=db.transaction(store).objectStore(store).get(key);r.onsuccess=()=>res(r.result);r.onerror=()=>res(undefined)}catch(e){res(undefined)}})}
 function idbDel(store,key){if(!db)return Promise.resolve();return new Promise(res=>{try{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(key);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
 let saveT=null;
-function snapshot(){return {v:3,keepAudio:S.keepAudio,musicFolder:S.musicFolder||'',widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
+function snapshot(){return {v:3,lockDrag:!!S.lockDrag,keepAudio:S.keepAudio,musicFolder:S.musicFolder||'',widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
 function hashStr(t){let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36)+':'+t.length}
 function saveSoon(){clearTimeout(saveT);saveT=setTimeout(async()=>{
   const data=snapshot();data.project={id:proj.id,name:proj.name,createdAt:proj.createdAt,savedHash:proj.savedHash,savedAt:proj.savedAt};
@@ -803,8 +809,11 @@ decks.addEventListener('pointerdown',e=>{
   const el=e.target.closest('.pad[data-pad]');if(!el||e.target.closest('.more,.lp'))return;held=false;
   const x0=e.clientX,y0=e.clientY;clearTimeout(hold);
   hold=setTimeout(()=>{held=true;openEditor(el.dataset.pad)},500);
-  const cancel=ev=>{if(ev.type==='pointermove'&&Math.hypot(ev.clientX-x0,ev.clientY-y0)<10)return;clearTimeout(hold);el.removeEventListener('pointermove',cancel);el.removeEventListener('pointerup',cancel);el.removeEventListener('pointercancel',cancel)};
-  el.addEventListener('pointermove',cancel);el.addEventListener('pointerup',cancel);el.addEventListener('pointercancel',cancel);
+  const off=()=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up)};
+  const mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)<12)return;clearTimeout(hold);off();
+    if(!S.lockDrag&&!held)startDrag(el,e,ev)};
+  const up=()=>{clearTimeout(hold);off()};
+  document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);
 });
 decks.addEventListener('contextmenu',e=>{if(e.target.closest('.pad'))e.preventDefault()});
 decks.addEventListener('click',e=>{
@@ -853,6 +862,47 @@ $('#decks').addEventListener('pointerdown',e=>{
 $('#decks').addEventListener('dblclick',e=>{if(!e.target.closest('.split'))return;if(S.widths)delete S.widths[S.nDecks];applyWidths();fitAll();saveSoon()});
 
 
+
+/* ---------- Drag to reorder: drop on a pad = insert there and push the rest to the right ---------- */
+let drag=null;
+function startDrag(el,e0,ev){
+  const r=el.getBoundingClientRect(),g=el.cloneNode(true);
+  g.classList.add('ghost');g.classList.remove('cued','live','fading');g.style.width=r.width+'px';g.style.height=r.height+'px';
+  document.body.appendChild(g);el.classList.add('dragsrc');held=true;
+  drag={id:el.dataset.pad,g,dx:e0.clientX-r.left,dy:e0.clientY-r.top,over:null,bankT:null,bankEl:null};
+  moveGhost(ev.clientX,ev.clientY);
+  document.addEventListener('pointermove',dragMove);document.addEventListener('pointerup',dragEnd);document.addEventListener('pointercancel',dragCancel);
+}
+function moveGhost(x,y){drag.g.style.left=(x-drag.dx)+'px';drag.g.style.top=(y-drag.dy)+'px'}
+function dragMove(ev){if(!drag)return;ev.preventDefault();moveGhost(ev.clientX,ev.clientY);
+  const hit=document.elementFromPoint(ev.clientX,ev.clientY);
+  const t=hit&&hit.closest('#decks .pad'),bk=hit&&hit.closest('#decks [data-bank]');
+  if(drag.over!==t){if(drag.over)drag.over.classList.remove('dropto');drag.over=t;if(t&&t.dataset.pad!==drag.id)t.classList.add('dropto')}
+  // hover a bank button for half a second to switch that window's bank while dragging
+  if(bk!==drag.bankEl){if(drag.bankEl)drag.bankEl.classList.remove('dropto');clearTimeout(drag.bankT);drag.bankEl=bk;
+    if(bk){bk.classList.add('dropto');drag.bankT=setTimeout(()=>{if(!drag)return;setBank(+bk.dataset.bank,deckOf(bk));drag.bankEl=null;drag.over=null;
+      const src=document.querySelector(`#decks .pad[data-pad="${drag.id}"]`);if(src)src.classList.add('dragsrc')},550)}}
+}
+function dragFinish(){if(!drag)return;clearTimeout(drag.bankT);drag.g.remove();document.querySelectorAll('.dropto,.dragsrc').forEach(x=>x.classList.remove('dropto','dragsrc'));
+  document.removeEventListener('pointermove',dragMove);document.removeEventListener('pointerup',dragEnd);document.removeEventListener('pointercancel',dragCancel);drag=null}
+function dragCancel(){dragFinish();renderGrid()}
+function dragEnd(ev){if(!drag)return;const id=drag.id;const hit=document.elementFromPoint(ev.clientX,ev.clientY);const t=hit&&hit.closest('#decks .pad');
+  dragFinish();
+  if(!t||t.dataset.pad===id){renderGrid();return}
+  const d=deckOf(t),bank=S.decks[d].bank,slot=t.dataset.pad?padById(t.dataset.pad).slot:+t.dataset.slot;
+  movePad(id,bank,slot);renderGrid();saveSoon();
+}
+function movePad(id,bank,slot){
+  const p=padById(id);if(!p)return;const N=BANKS*PADS_PER_BANK,to=bank*PADS_PER_BANK+slot;
+  if(p.bank*PADS_PER_BANK+p.slot===to)return;
+  const occ=new Map(S.pads.filter(x=>x!==p).map(x=>[x.bank*PADS_PER_BANK+x.slot,x]));
+  if(occ.has(to)){let i=to;const chain=[];while(i<N&&occ.has(i)){chain.push(occ.get(i));i++}
+    if(i>=N){toast('Não há espaço livre depois dessa posição para deslocar os pads.');return}
+    for(let k=chain.length-1;k>=0;k--){const n=to+k+1;chain[k].bank=Math.floor(n/PADS_PER_BANK);chain[k].slot=n%PADS_PER_BANK}}
+  p.bank=bank;p.slot=slot;
+}
+function setLock(on){S.lockDrag=on;const b=$('#arrBtn');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.textContent=on?'🔒 Travado':'Travar';saveSoon()}
+
 /* ---------- Organize: tap a pad, then tap where it goes (swap if occupied) ---------- */
 function setArrange(on){S.arrange=on;S.pick=null;const b=$('#arrBtn');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.textContent=on?'Pronto':'Organizar';
   renderGrid();if(on)toast('Toque num pad e depois no lugar para onde ele vai. Toque em Pronto para voltar a tocar.')}
@@ -865,7 +915,7 @@ function arrangeClick(e){
     renderGrid();return}
   if(empty&&S.pick){const a=padById(S.pick),d=deckOf(empty);a.bank=S.decks[d].bank;a.slot=+empty.dataset.slot;S.pick=null;saveSoon();renderGrid()}
 }
-$('#arrBtn').onclick=()=>setArrange(!S.arrange);
+$('#arrBtn').onclick=()=>{setLock(!S.lockDrag);toast(S.lockDrag?'Pads travados: arrastar não muda nada.':'Pads destravados: segure e arraste para reordenar.')};
 
 /* ---------- Loop toggle (pad button, window, MIDI) ---------- */
 function toggleLoop(p){if(!p)return;p.loop=!p.loop;paintLoop(p);saveSoon()}
@@ -1194,7 +1244,7 @@ async function saveProject(asName,where){
 }
 async function loadState(st){
   S.pads=(st.pads||[]).map(p=>({stopMode:p.stopMode||(p.retrig==='stop'&&p.fadeOut>0?'fade':'cut'),...p}));
-  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};S.keepAudio=st.keepAudio!==false;S.musicFolder=st.musicFolder||'';S.pick=null;
+  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};S.keepAudio=st.keepAudio!==false;S.lockDrag=!!st.lockDrag;S.musicFolder=st.musicFolder||'';S.pick=null;
   S.decks.forEach((d,i)=>{d.cue=null;d.bank=i;d.vol=1});S.active=0;
   (st.banks||[st.bank||0,1,2]).forEach((b,i)=>{if(S.decks[i])S.decks[i].bank=Math.min(BANKS-1,b||0)});
   (st.deckVols||[]).forEach((v,i)=>{if(S.decks[i]&&isFinite(v))S.decks[i].vol=v});
@@ -1280,7 +1330,7 @@ document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLower
     await loadState(st);if(st.project)proj=Object.assign(proj,st.project);
     saveSoon();
   }else{try{await makeExamples()}catch(e){}}
-  vsPaint('master');renderGrid();paintProj();paintLink();paintAudio();askLinkIfNeeded();requestAnimationFrame(frame);midiInit();
+  setLock(!!S.lockDrag);vsPaint('master');renderGrid();paintProj();paintLink();paintAudio();askLinkIfNeeded();requestAnimationFrame(frame);midiInit();
 })();
 })();
 </script>
