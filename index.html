@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<title>Lumia Pro iPad</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lumia">
+<meta name="theme-color" content="#0b0c10">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0c10; --rail:#121419; --panel:#15171d; --pad:#1c1f26; --pad-hi:#252932; --line:#262a33; --line2:#363b47;
+  --text:#ecebf2; --muted:#8c8d99; --accent:#9a8bff;
+  --live:#3fd08f; --danger:#ff5d62; --cue:#f2b33d;
+  --pill-empty:#3b3b41; --pill-fill:#dadade;
+  --ui:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;overflow:hidden;margin:0}
+body{box-sizing:border-box;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+body{background:var(--bg);color:var(--text);font-family:var(--ui);font-size:16px;line-height:1.3;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overscroll-behavior:none;-webkit-touch-callout:none}
+input[type=text],input[type=number]{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{height:100%;display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px;padding-inline:16px;padding-block:12px}
+
+/* ---------- Buttons ---------- */
+.btn{min-height:52px;min-width:52px;padding:0 16px;border-radius:12px;border:1px solid var(--line2);background:var(--pad);
+  font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn:active{background:var(--pad-hi)}
+.btn.on{background:var(--accent);border-color:var(--accent);color:#14121f}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.x{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.x.armed{color:var(--danger);border-color:var(--danger)}
+
+/* ---------- Left rail ---------- */
+.rail{display:flex;flex-direction:column;gap:10px;min-height:0;align-items:stretch}
+.brand{text-align:center;line-height:1.05;padding-top:2px}
+.brand b{display:block;font-weight:700;letter-spacing:.28em;font-size:16px;margin-right:-.28em}
+.brand span{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em}
+.rail .stop{min-height:48px;gap:5px;border-color:var(--danger);color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,var(--pad));font-size:11.5px;padding:0 4px;letter-spacing:0}
+.rail .stop i{font-style:normal;font-size:12px}
+.rail .fade{position:relative;overflow:hidden;min-height:48px;padding:0 6px;font-size:12px}
+.rail .fade.busy{border-color:var(--cue);color:#1b1405;background:color-mix(in srgb,var(--cue) 35%,var(--pad))}
+.rail .fade.busy::before{content:'';position:absolute;inset:0 auto 0 0;width:100%;background:var(--cue);transform-origin:left;animation:drain 3s linear forwards;z-index:0}
+.rail .fade span{position:relative;z-index:1}
+@keyframes drain{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.wins{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.wins button{min-height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--pad);font-family:var(--mono);font-weight:600;font-size:15px;cursor:pointer;padding:0}
+.wins button.on{background:var(--accent);border-color:var(--accent);color:#14121f}
+.projbtn{min-height:52px;flex-direction:column;gap:1px;padding:4px 6px;text-transform:none;letter-spacing:0;font-size:13px;line-height:1.15;white-space:normal}
+.projbtn b{font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.projbtn small{font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:500}
+.projbtn.dirty small{color:var(--cue)}
+.pcur{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.pcur b{font-size:18px}
+.pcur span{font-size:14px;color:var(--muted)}
+.pcur span.dirty{color:var(--cue)}
+.pacts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pacts .btn{min-width:0}
+.plist{display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow:auto;-webkit-overflow-scrolling:touch;min-height:60px}
+.prow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;min-height:60px;padding:6px 6px 6px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--pad)}
+.prow b{display:block;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow span{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.prow.cur{border-color:var(--accent)}
+.prow .btn{min-height:48px}
+.pempty{color:var(--muted);font-size:15px;padding:8px 2px}
+.pfile{display:flex;gap:8px;flex-wrap:wrap}
+.mlabel{text-align:center;font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:600}
+.mwrap{flex:1;min-height:120px;display:flex;justify-content:center}
+.mwrap .vs{width:64px}
+.status{display:flex;flex-direction:column;gap:6px}
+.pill{font-family:var(--mono);font-size:11px;padding:5px 4px;border-radius:99px;border:1px solid var(--line2);white-space:nowrap;color:var(--muted);text-align:center}
+.pill.warn{border-color:var(--cue);color:var(--cue)}
+.pill.ok{border-color:var(--live);color:var(--live)}
+.rail .sep{height:1px;background:var(--line2);margin:8px 6px 4px}
+.rail .help{align-self:center;width:52px;height:52px;min-width:0;padding:0;border-radius:50%;background:transparent;font-size:18px;color:var(--muted)}
+button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(--mono);font-size:11px}
+.midi-t{width:100%;border-collapse:collapse;font-size:14px}
+.midi-t th,.midi-t td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+.midi-t th{font-family:var(--mono);font-size:12px;color:var(--cue);font-weight:600;white-space:nowrap;width:36%}
+.midi-last{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.midi-state{padding:10px 12px;border-radius:10px;border:1px solid var(--line2);font-size:15px}
+.midi-state.ok{border-color:var(--live);color:var(--live)}
+.midi-state.warn{border-color:var(--cue);color:var(--text)}
+
+/* ---------- Pad deck ---------- */
+.decks{display:grid;gap:0;min-height:0;grid-template-columns:minmax(0,1fr)}
+.split{position:relative;width:14px;cursor:col-resize;touch-action:none;display:flex;align-items:center;justify-content:center}
+.split::before{content:'';position:absolute;inset:0 -8px}
+.split i{width:4px;height:64px;border-radius:2px;background:var(--line2)}
+.split.drag i,.split:active i{background:var(--accent);height:120px}
+.deck{display:grid;grid-template-columns:minmax(0,1fr) 52px;grid-template-rows:minmax(0,1fr) auto;gap:10px;min-height:0;border-radius:16px}
+.deck .grid{grid-column:1;grid-row:1}
+.deck .banks{grid-column:1/-1;grid-row:2}
+.dvol{grid-column:2;grid-row:1;display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0;text-align:center}
+.dvol label{font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:600;white-space:nowrap}
+.deck.active .dvol label{color:var(--accent)}
+.dvol .vs{border-radius:18px;min-height:0}
+.dvol .vsv{font-size:12px;top:8px}
+.dvol .vsi{width:24px;height:24px;margin-left:-12px;bottom:8px}
+.decks.multi .deck{grid-template-columns:minmax(0,1fr) 42px}
+.decks.multi .deck{padding:6px;border:1px solid var(--line);gap:6px}
+.decks.multi .deck.active{border-color:var(--accent)}
+.grid{--gc:6;--gr:4;display:grid;grid-template-columns:repeat(var(--gc),minmax(0,1fr));grid-template-rows:repeat(var(--gr),minmax(0,1fr));gap:10px;min-height:0}
+.decks.multi .grid{gap:6px}
+.decks.multi .banks{grid-template-columns:auto repeat(6,1fr);gap:4px}
+.decks.multi .bank{min-height:44px;font-size:13px;padding:0;border-radius:12px}
+.decks.multi .bank .dot{top:5px;right:5px;width:6px;height:6px}
+.dlabel{display:none;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--muted);padding:0 6px;font-weight:600}
+.decks.multi .dlabel{display:flex}
+.deck.active .dlabel{color:var(--accent)}
+.deck.dense .pad{padding:7px 7px 6px;border-radius:12px;gap:2px}
+.deck.dense .pad .pname{font-size:12px;-webkit-line-clamp:2;padding-right:24px}
+.deck.dense .pad .more{width:30px;height:30px;font-size:16px;top:2px;right:2px}
+.deck.dense .pad .pmeta{flex-direction:row;align-items:center}
+.deck.dense .pad .pleft{flex-direction:row;align-items:center;gap:6px}
+.deck.dense .pad .lp{min-width:0;height:28px;font-size:10px;padding:0 6px;gap:4px}
+.deck.dense .pad .lp.on::before{width:5px;height:5px}
+.deck.dense .pad .ptime{font-size:11px}
+.deck.dense .pad .ptags{display:none}
+.deck.dense .pad .cuetag{font-size:10px;padding:2px 5px;bottom:6px;right:6px}
+.deck.dense .pad.empty{font-size:11px}
+.deck.dense .pad.empty b{font-size:20px}
+.deck.tiny .pad .ptime{display:none}
+.deck.tiny .pad .pname{padding-right:20px}
+.pad{position:relative;border-radius:14px;border:1px solid #0e1014;background:linear-gradient(180deg,var(--pad-hi),var(--pad));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 0 rgba(0,0,0,.45);padding:10px 10px 9px;display:flex;flex-direction:column;gap:4px;
+  cursor:pointer;overflow:hidden;text-align:left;min-height:0;touch-action:manipulation}
+.pad:active{filter:brightness(1.1)}
+.pad.empty{background:transparent;border:1px dashed var(--line2);box-shadow:none;align-items:center;justify-content:center;color:#454a57;font-size:13px;font-weight:600;letter-spacing:.08em;text-align:center}
+.pad.empty b{font-size:26px;font-weight:500;line-height:1;display:block}
+.pad .pname{font-weight:700;font-size:14px;line-height:1.15;text-transform:uppercase;letter-spacing:.02em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word;padding-right:30px;position:relative;z-index:1}
+.pad .pmeta{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:6px;position:relative;z-index:1}
+.pad .ptime{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.pad .ptags{font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.pad .tint{position:absolute;inset:auto 0 0 0;height:38%;background:linear-gradient(0deg,color-mix(in srgb,var(--c) 26%,transparent),transparent);pointer-events:none}
+.pad .more{position:absolute;top:4px;right:4px;width:40px;height:40px;border-radius:10px;border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center}
+.pad .more:active{background:rgba(255,255,255,.08)}
+.pad .prog{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(0,0,0,.16);pointer-events:none}
+.pad.live{background:var(--c);border-color:var(--c);color:#0b1510;box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 45%,transparent),0 0 18px color-mix(in srgb,var(--c) 30%,transparent)}
+.pad.live .ptime,.pad.live .ptags,.pad.live .more{color:rgba(0,0,0,.7)}
+.pad.live .tint{display:none}
+.pad.fading{opacity:.6}
+.pad.missing{opacity:.55}
+.pad.missing .ptime{color:var(--danger)}
+.pad.drop{border-color:var(--accent);color:var(--accent)}
+.pad.cued{border-color:var(--cue);box-shadow:0 0 0 3px var(--cue),inset 0 1px 0 rgba(255,255,255,.06)}
+.pad .cuetag{display:none;position:absolute;bottom:10px;right:10px;font-family:var(--mono);font-size:13px;font-weight:700;color:#1b1405;background:var(--cue);border-radius:6px;padding:3px 8px;z-index:2}
+.pad.cued .ptags{visibility:hidden}
+.pad.cued .cuetag{display:block}
+.pad .lp{min-width:88px;height:36px;border-radius:8px;border:1px dashed var(--line2);background:rgba(0,0,0,.25);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--muted);cursor:pointer;padding:0 8px;display:inline-flex;align-items:center;gap:6px}
+.pad .lp b{font-weight:700;color:#6b6e7a}
+.pad .lp.on{background:var(--text);border:1px solid var(--text);color:#111}
+.pad .lp.on b{color:#0a7a45}
+.pad .lp.on::before{content:'';width:7px;height:7px;border-radius:50%;background:#12b56a}
+.pad.live .lp{border-color:rgba(0,0,0,.35);color:rgba(0,0,0,.75);background:rgba(255,255,255,.18)}
+.pad.live .lp.on{background:#111;border-color:#111;color:var(--c)}
+.pad.live .lp.on b{color:var(--c)}
+.pad.live .lp b{color:rgba(0,0,0,.6)}
+.pad .pleft{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+
+.banks{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.bank{position:relative;min-height:52px;border-radius:26px;border:1px solid var(--line2);background:var(--rail);font-weight:700;letter-spacing:.08em;font-size:14px;cursor:pointer;color:var(--muted)}
+.bank.on{color:var(--live);border-color:var(--live);background:color-mix(in srgb,var(--live) 10%,var(--rail))}
+.bank .dot{position:absolute;top:8px;right:14px;width:8px;height:8px;border-radius:50%;background:var(--live)}
+
+/* ---------- Vertical pill slider ---------- */
+.vs{position:relative;width:100%;height:100%;min-height:96px;border-radius:22px;background:var(--pill-empty);overflow:hidden;touch-action:none;cursor:ns-resize;isolation:isolate}
+.vsf{position:absolute;left:0;right:0;bottom:0;background:var(--pill-fill)}
+.vs.drag .vsf{background:#fff}
+.vs.drag{box-shadow:0 0 0 2px var(--accent)}
+.vsv{position:absolute;top:10px;left:0;right:0;text-align:center;font-family:var(--mono);font-weight:600;font-size:14px;color:#fff;mix-blend-mode:difference;font-variant-numeric:tabular-nums;pointer-events:none}
+.vsi{position:absolute;bottom:12px;left:50%;width:30px;height:30px;margin-left:-15px;color:#fff;mix-blend-mode:difference;pointer-events:none}
+
+/* ---------- Sheets ---------- */
+.sheet{position:fixed;inset:0;background:rgba(4,4,7,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.card{background:var(--panel);border:1px solid var(--line2);border-radius:18px;padding:20px;max-width:620px;width:100%;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.card h3{margin:0;font-size:20px}
+.card ol{padding-left:22px;margin:0;display:grid;gap:8px;max-width:64ch}
+.card p{color:var(--muted);margin:0;max-width:64ch}
+.btns{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.num{width:100%;min-height:48px;border-radius:10px;border:1px solid var(--line2);background:var(--bg);color:var(--text);font-family:var(--mono);font-size:16px;padding:0 10px;font-variant-numeric:tabular-nums}
+
+.src{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.srcbtn{min-height:120px;border-radius:14px;border:1px solid var(--line2);background:var(--pad);padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.srcbtn:active{background:var(--pad-hi)}
+.srcbtn b{font-size:18px}
+.srcbtn span{color:var(--muted);font-size:14px;line-height:1.35}
+.keep{display:flex;align-items:center;gap:12px;min-height:52px;font-size:16px;cursor:pointer}
+.keep input{width:28px;height:28px;accent-color:var(--accent);flex:none}
+.keep small{display:block;color:var(--muted);font-size:13px}
+.dsearch{display:grid;grid-template-columns:1fr auto;gap:8px}
+.dlist{display:flex;flex-direction:column;gap:6px;max-height:40vh;overflow:auto;-webkit-overflow-scrolling:touch}
+.dfile{min-height:56px;border-radius:10px;border:1px solid var(--line2);background:var(--pad);padding:8px 12px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;text-align:left;cursor:pointer}
+.dfile b{font-weight:600;font-size:15px;word-break:break-word}
+.dfile span{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.dfile.busy{border-color:var(--accent)}
+.dfile:disabled{opacity:.4}
+.dstate{color:var(--muted);font-size:14px;min-height:20px}
+
+
+/* ---------- Pad editor window ---------- */
+.edcard{background:var(--panel);border:1px solid var(--line2);border-radius:20px;width:min(1020px,100%);height:min(700px,100%);padding:16px;
+  display:grid;grid-template-rows:auto minmax(0,1fr);gap:14px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.edhead{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:12px;align-items:center}
+.edhead .slotno{font-family:var(--mono);font-size:13px;color:var(--muted);padding:0 4px;white-space:nowrap}
+.edhead .name{min-height:52px;font-family:var(--ui);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.swatches{display:flex;gap:6px}
+.swatches button{width:36px;height:36px;border-radius:50%;border:2px solid transparent;cursor:pointer;background:var(--c)}
+.swatches button.on{border-color:var(--text);box-shadow:0 0 0 2px var(--panel) inset}
+.edbody{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;min-height:0}
+.edleft{display:grid;grid-template-rows:auto minmax(80px,1fr) auto auto auto auto;gap:10px;min-height:0}
+.edplay{display:grid;grid-template-columns:1.3fr 1fr 1fr auto;gap:8px;align-items:center}
+.edplay .btn{min-width:0;padding:0 8px}
+.btn.cut{border-color:var(--danger);color:var(--danger);min-height:64px}
+.btn.soft{min-height:64px}
+.playbig{min-height:64px;font-size:17px;border-color:var(--live);color:var(--live)}
+.playbig.live{background:var(--live);color:#07210f}
+.readout{font-family:var(--mono);font-size:26px;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.readout small{display:block;font-size:12px;color:var(--muted)}
+.wave{width:100%;height:100%;min-height:80px;border-radius:12px;background:var(--bg);border:1px solid var(--line);display:block;touch-action:none;cursor:crosshair}
+.io{display:grid;grid-template-columns:96px 1fr 96px 1fr;gap:8px;align-items:center}
+.io .btn{min-width:0;padding:0 8px;font-size:12px;min-height:48px}
+.opt{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center}
+.opt>span{font-size:14px;color:var(--muted)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;min-height:48px;border-radius:10px;border:1px solid var(--line2);background:var(--pad);cursor:pointer;font-weight:600;font-size:14px}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:#14121f}
+.edfoot{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.edmix{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;min-height:0}
+.strip{display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;min-height:0;text-align:center}
+.strip label{font-size:11px;letter-spacing:.1em;color:var(--muted);font-weight:600;text-transform:uppercase;white-space:nowrap}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--pad-hi);border:1px solid var(--line2);padding:12px 18px;border-radius:12px;max-width:min(90vw,560px);font-size:15px;z-index:50}
+.rotate{display:none;position:fixed;inset:0;z-index:60;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}
+.rotate .ph{width:120px;height:84px;border:3px solid var(--accent);border-radius:12px;position:relative}
+.rotate .ph::after{content:"";position:absolute;right:8px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--accent);transform:translateY(-50%)}
+.rotate b{font-size:22px}
+.rotate p{color:var(--muted);margin:0;max-width:34ch}
+
+@media (orientation:portrait) and (pointer:coarse) and (min-width:700px){.rotate{display:flex}}
+@media (max-width:900px){
+  html,body{overflow:auto}
+  .app{height:auto;min-height:100%;grid-template-columns:1fr}
+  .rail{flex-direction:row;flex-wrap:wrap;align-items:center}
+  .mwrap{flex:0 0 64px;min-height:0;height:160px}
+  .decks{grid-template-columns:1fr!important}
+  .split{display:none}
+  .grid{grid-template-rows:none;grid-auto-rows:110px}
+  .banks{grid-template-columns:repeat(3,1fr)}
+  .edcard{height:auto;max-height:100%;overflow:auto}
+  .edbody{grid-template-columns:1fr}
+  .edmix{height:260px}
+  .edhead{grid-template-columns:1fr auto}
+  .src{grid-template-columns:1fr}
+}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand"><b>LUMIA</b><span>PRO · iPAD</span></div>
+    <button class="btn projbtn" id="projBtn" title="Salvar, abrir e projetos recentes"><b id="projName">Sem título</b><small id="projState">não salvo</small></button>
+    <button class="btn stop" id="stopAll" title="Parar tudo (Esc)"><i>■</i>Parar tudo</button>
+    <button class="btn fade" id="fadeAll" title="Fade de 3 s em tudo que está tocando"><span>Fade 3s</span></button>
+    <div class="mlabel">JANELAS</div>
+    <div class="wins" id="wins" role="group" aria-label="Quantas janelas de pads"><button data-win="1">1</button><button data-win="2">2</button><button data-win="3">3</button></div>
+    <div class="mlabel">MASTER</div>
+    <div class="mwrap" id="masterBox"></div>
+    <div class="status"><span class="pill warn" id="audioPill">Som: toque</span><span class="pill" id="storePill">…</span><button class="pill warn" id="midiPill" title="Controlador MIDI">MIDI –</button></div>
+    <div class="sep" aria-hidden="true"></div>
+    <button class="btn help" id="helpBtn" aria-label="Ajuda">?</button>
+  </aside>
+  <main class="decks n1" id="decks"></main>
+</div>
+<input type="file" id="picker" accept="audio/*,.mp3,.m4a,.aac,.wav,.aif,.aiff,.flac,.caf" multiple hidden>
+<div class="toast" id="toast" hidden></div>
+<div class="rotate" aria-live="polite"><div class="ph"></div><b>Gire o iPad</b><p>O Lumia Pro iPad foi desenhado para a horizontal. Vire o iPad de lado para usar.</p></div>
+
+<!-- Pad editor window -->
+<div class="sheet" id="ed" hidden>
+  <div class="edcard" role="dialog" aria-labelledby="e-name">
+    <div class="edhead">
+      <span class="slotno" id="e-slot">A1</span>
+      <input class="num name" type="text" id="e-name" aria-label="Nome do pad">
+      <div class="swatches" id="e-colors"></div>
+      <button class="btn on" id="e-close">Fechar</button>
+    </div>
+    <div class="edbody">
+      <div class="edleft">
+        <div class="edplay"><button class="btn playbig" id="e-play">▶ Play</button><button class="btn cut" id="e-stopcut">■ Stop</button><button class="btn soft" id="e-stopfade">Stop com fade</button><div class="readout" id="e-ro">0:00.0<small id="e-dur">de 0:00.0</small></div></div>
+        <canvas class="wave" id="wave" aria-label="Forma de onda: toque para mover o IN ou o OUT mais próximo"></canvas>
+        <div class="io">
+          <input class="num" type="number" id="e-in" data-f="inPoint" min="0" step="0.1" inputmode="decimal" aria-label="IN em segundos">
+          <button class="btn" data-mark="inPoint">Marcar IN</button>
+          <input class="num" type="number" id="e-out" data-f="outPoint" min="0" step="0.1" inputmode="decimal" aria-label="OUT em segundos, 0 é o fim">
+          <button class="btn" data-mark="outPoint">Marcar OUT</button>
+        </div>
+        <div class="opt"><span>Loop</span><div class="seg" id="e-loop"><button data-v="0">Off</button><button data-v="1">On (IN → OUT)</button></div></div>
+        <div class="opt"><span>Stop do 3º toque e ao trocar de pad</span><div class="seg" id="e-stopmode"><button data-v="cut">Stop seco</button><button data-v="fade">Stop com fade out</button></div></div>
+        <div class="edfoot"><button class="btn" id="e-replace">Trocar arquivo</button><button class="btn x" id="e-del">Remover pad</button></div>
+      </div>
+      <div class="edmix" id="e-mix"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add music -->
+<div class="sheet" id="add" hidden>
+  <div class="card" role="dialog" aria-labelledby="addT">
+    <h3 id="addT">Adicionar música</h3>
+    <div id="addPick">
+      <div class="src">
+        <button class="srcbtn" id="srcFiles"><b>Arquivos</b><span>No meu iPad, HD ou pendrive no USB-C, iCloud Drive, e Dropbox ou Google Drive se os apps deles estiverem instalados. Escolha várias para preencher os próximos pads.</span></button>
+        <button class="srcbtn" id="srcDrive"><b>Google Drive</b><span>Busca direto na sua conta pelo conector do Claude e baixa a música para o iPad.</span></button>
+      </div>
+    </div>
+    <div id="addDrive" hidden>
+      <div class="dsearch"><input class="num" type="text" id="dq" placeholder="Nome da música (vazio = todos os áudios)" style="font-family:var(--ui)"><button class="btn" id="dgo">Buscar</button></div>
+      <div class="dstate" id="dstate"></div>
+      <div class="dlist" id="dlist"></div>
+      <button class="btn x" id="dback" style="align-self:flex-start">‹ Outras fontes</button>
+    </div>
+    <label class="keep"><input type="checkbox" id="keepCopy" checked><span>Guardar cópia neste iPad<small>Desligado: toca sem ocupar espaço, mas depois de recarregar você reconecta o arquivo com um toque.</small></span></label>
+    <div class="btns"><span></span><button class="btn" id="addClose">Fechar</button></div>
+  </div>
+</div>
+
+<!-- Project -->
+<div class="sheet" id="proj" hidden>
+  <div class="card" role="dialog" aria-labelledby="projT">
+    <h3 id="projT">Projeto</h3>
+    <div class="pcur"><b id="pName">Sem título</b><span id="pState"></span></div>
+    <div class="pacts"><button class="btn on" id="pSave">Salvar</button><button class="btn" id="pSaveAs">Salvar como…</button><button class="btn" id="pNew">Novo</button></div>
+    <div class="dsearch" id="pAsRow" hidden><input class="num" type="text" id="pAsName" placeholder="Nome do projeto" style="font-family:var(--ui)"><button class="btn on" id="pAsOk">Salvar como</button></div>
+    <div class="seg" id="pTabs"><button data-v="recent" class="on">Abrir recentes</button><button data-v="all">Abrir… (todos)</button></div>
+    <div class="plist" id="pList"></div>
+    <div class="btns"><div class="pfile"><button class="btn" id="pExport">Exportar arquivo</button><button class="btn" id="pImport">Importar arquivo</button></div><button class="btn" id="pClose">Fechar</button></div>
+    <p>Os projetos ficam guardados neste iPad. <b>Exportar arquivo</b> gera um .json com todos os ajustes (sem as músicas) para levar a outro aparelho; lá, importe o arquivo e depois as músicas com os mesmos nomes, que elas se reconectam sozinhas.</p>
+  </div>
+</div>
+<input type="file" id="projPicker" accept=".json,application/json" hidden>
+
+<!-- MIDI -->
+<div class="sheet" id="midi" hidden>
+  <div class="card" role="dialog" aria-labelledby="midiT">
+    <h3 id="midiT">nanoKONTROL2</h3>
+    <div class="midi-state" id="midiState">Verificando MIDI…</div>
+    <div style="overflow-x:auto"><table class="midi-t">
+      <tr><th>S · M · R (1 a 8)</th><td>Os 24 botões são os 24 pads do banco da janela ativa (borda roxa): S = pads 1 a 8, M = 9 a 16, R = 17 a 24. Mesmo ciclo do toque: cue, play, stop.</td></tr>
+      <tr><th>▶ PLAY</th><td>Play no pad em cue</td></tr>
+      <tr><th>■ STOP</th><td>Stop seco no pad tocando</td></tr>
+      <tr><th>◀◀</th><td>Stop com fade out no pad tocando</td></tr>
+      <tr><th>▶▶</th><td>Fade de 3 s em tudo (todas as janelas)</td></tr>
+      <tr><th>● REC</th><td>Parar tudo na hora</td></tr>
+      <tr><th>CYCLE</th><td>Loop ON/OFF no pad em foco (tocando ou em cue)</td></tr>
+      <tr><th>TRACK ◀ ▶</th><td>Move o cue para o pad anterior ou seguinte, sem parar o que está tocando</td></tr>
+      <tr><th>MARKER ◀ ▶</th><td>Banco anterior ou seguinte da janela ativa</td></tr>
+      <tr><th>SET</th><td>Troca a janela ativa (com 2 ou 3 janelas abertas)</td></tr>
+      <tr><th>Fader 1</th><td>Volume do pad em foco</td></tr>
+      <tr><th>Knob 1 · Knob 2</th><td>Fade in · Fade out do pad em foco (0 a 10 s)</td></tr>
+      <tr><th>Faders 5 · 6 · 7</th><td>Master das janelas 1 · 2 · 3</td></tr>
+      <tr><th>Fader 8</th><td>Master geral</td></tr>
+    </table></div>
+    <div class="midi-last" id="midiLast">Nenhuma mensagem recebida ainda.</div>
+    <p>O mapa usa os CCs de fábrica do nanoKONTROL2 no canal 1, os mesmos do Lumia Pro v5. Os botões precisam estar no modo momentâneo, que é o padrão.</p>
+    <div class="btns"><span></span><button class="btn on" id="midiClose">Fechar</button></div>
+  </div>
+</div>
+
+<!-- Help -->
+<div class="sheet" id="help" hidden>
+  <div class="card" role="dialog" aria-labelledby="helpT">
+    <h3 id="helpT">Como usar no palco</h3>
+    <ol>
+      <li>Toque num pad vazio para adicionar música: <b>Arquivos</b> (iPad, HD, iCloud, Dropbox, Google Drive pelos apps) ou <b>Google Drive</b> direto.</li>
+      <li>1º toque no pad: <b style="color:var(--cue)">CUE</b>. 2º toque: <b style="color:var(--live)">PLAY</b>. 3º toque: <b>STOP</b>.</li>
+      <li>Tocar em outro pad para o que está tocando e coloca o novo em CUE. Cada pad escolhe se esse stop é seco ou com fade out.</li>
+      <li><b>LOOP</b> no próprio pad liga e desliga a repetição, mesmo com a música tocando.</li>
+      <li>Janela do pad: toque no <b>⋯</b> ou segure o pad por meio segundo. Lá ficam Play, Stop, Stop com fade, volume, fades, velocidade, IN/OUT, loop, tipo de stop e cor.</li>
+      <li>São 6 bancos (A a F) de 24 pads. O ponto verde no banco indica que tem algo tocando lá.</li>
+      <li>Arraste a <b>divisória</b> entre as janelas para mudar a largura; os pads se reorganizam sozinhos. Toque duas vezes na divisória para voltar a larguras iguais.</li>
+      <li>Cada janela tem seu próprio <b>master</b> (slider J1, J2, J3 ao lado da grade). O som passa pelo master da janela e depois pelo master geral.</li>
+      <li><b>Janelas 1, 2 ou 3</b>: grades lado a lado, cada uma com seu banco e seu cue. Um pad de uma janela toca por cima do pad de outra; dentro da mesma janela, só um toca por vez. A janela com borda roxa é a que o MIDI controla (a última que você tocou).</li>
+      <li>Sliders: arraste para cima ou para baixo. Tocar sem arrastar não muda nada. Com teclado, <kbd>Esc</kbd> para tudo.</li>
+      <li><b>Offline</b>: depois de abrir uma vez com internet, o Lumia abre sem rede. No Safari, use Compartilhar › Adicionar à Tela de Início para abrir em tela cheia, como app.</li>
+      <li><b>Projeto</b> (no topo da coluna esquerda): Salvar, Salvar como, Novo, Abrir e Abrir recentes. O ponto âmbar indica alterações não salvas. Com teclado, <kbd>⌘S</kbd> salva.</li>
+      <li><b>nanoKONTROL2</b>: toque em MIDI, na coluna da esquerda, para ver o mapa dos botões.</li>
+      <li>Pad apagado com <b>reconectar</b>: toque e escolha o mesmo arquivo (ou ele baixa de novo do Drive).</li>
+    </ol>
+    <p>Antes do show: desligue o bloqueio automático da tela (Ajustes › Tela e Brilho) e, se puder, use o Acesso Guiado. Com a tela bloqueada ou o Safari em segundo plano o som pode parar. A saída de áudio é a do iPad; escolha na Central de Controle.</p>
+    <div class="btns"><span></span><button class="btn on" id="helpClose">Fechar</button></div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const PADS_PER_BANK=24, BANKS=6, BANK_NAMES='ABCDEF';
+const COLORS=['#3fd08f','#44b8d6','#9a8bff','#f2b33d','#ff7d5c','#e56fd2','#a4a7b3'];
+const uid=()=>Math.random().toString(36).slice(2,10);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=s=>{if(!isFinite(s)||s<0)s=0;const m=Math.floor(s/60),r=s-m*60;return m+':'+(r<10?'0':'')+r.toFixed(1)};
+const pct=v=>Math.round(v*100)+'%', secs=v=>(+v).toFixed(1)+'s', mult=v=>(+v).toFixed(2)+'x';
+
+let proj={id:null,name:'Sem título',createdAt:null,savedAt:null,savedHash:null};
+const S={pads:[],masterVolume:0.9,editing:null,nDecks:1,active:0,decks:[{bank:0,cue:null,vol:1},{bank:1,cue:null,vol:1},{bank:2,cue:null,vol:1}]};
+const D=()=>S.decks[S.active];
+const padById=id=>S.pads.find(p=>p.id===id);
+const padAt=(b,s)=>S.pads.find(p=>p.bank===b&&p.slot===s);
+const label=p=>BANK_NAMES[p.bank]+(p.slot+1);
+
+/* ---------- Icons ---------- */
+const ICON={
+  vol:'<svg class="vsi" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h4l6-5v16l-6-5H5z" fill="currentColor" stroke="none"/><path d="M19 11.5a5 5 0 0 1 0 7M22.5 8.5a9.5 9.5 0 0 1 0 13"/></svg>',
+  master:'<svg class="vsi" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h4l6-5v16l-6-5H4z" fill="currentColor" stroke="none"/><path d="M17.5 12a4 4 0 0 1 0 6M21 9.5a8 8 0 0 1 0 11M24.5 7a12 12 0 0 1 0 16"/></svg>',
+  fin:'<svg class="vsi" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 24L20 7h6"/><path d="M4 24h22" stroke-width="1.6" opacity=".6"/></svg>',
+  fout:'<svg class="vsi" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h6l16 17"/><path d="M4 24h22" stroke-width="1.6" opacity=".6"/></svg>',
+  xf:'<svg class="vsi" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l22 17M4 24L26 7"/></svg>',
+  speed:'<svg class="vsi" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21a10 10 0 1 1 20 0"/><path d="M15 21l5-7"/></svg>'
+};
+
+/* ---------- Storage (IndexedDB, best effort) ---------- */
+let db=null, storeOk=false;
+function idbOpen(){return new Promise(res=>{try{const r=indexedDB.open('lumia-pro-ipad',1);
+  r.onupgradeneeded=()=>{r.result.createObjectStore('files');r.result.createObjectStore('kv')};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null)}catch(e){res(null)}})}
+function idbPut(store,key,val){if(!db)return Promise.resolve(false);return new Promise(res=>{try{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(val,key);tx.oncomplete=()=>res(true);tx.onerror=tx.onabort=()=>res(false)}catch(e){res(false)}})}
+function idbGet(store,key){if(!db)return Promise.resolve(undefined);return new Promise(res=>{try{const r=db.transaction(store).objectStore(store).get(key);r.onsuccess=()=>res(r.result);r.onerror=()=>res(undefined)}catch(e){res(undefined)}})}
+function idbDel(store,key){if(!db)return Promise.resolve();return new Promise(res=>{try{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(key);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
+let saveT=null;
+function snapshot(){return {v:3,widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
+function hashStr(t){let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36)+':'+t.length}
+function saveSoon(){clearTimeout(saveT);saveT=setTimeout(async()=>{
+  const data=snapshot();data.project={id:proj.id,name:proj.name,createdAt:proj.createdAt,savedHash:proj.savedHash,savedAt:proj.savedAt};
+  const ok=await idbPut('kv','pads',data);if(!ok&&storeOk){storeOk=false;paintStore()}
+  paintProj();
+},350)}
+function paintStore(){const p=$('#storePill');p.textContent=storeOk?'Memória ok':'Sem memória';p.title=storeOk?'Músicas e ajustes ficam guardados neste iPad':'Este navegador não deixou salvar: tudo some ao recarregar';p.className='pill '+(storeOk?'':'warn')}
+
+const blobs=new Map(), urls=new Map();
+function urlFor(key){if(urls.has(key))return urls.get(key);const b=blobs.get(key);if(!b)return null;const u=URL.createObjectURL(b);urls.set(key,u);return u}
+
+/* ---------- Audio engine ---------- */
+let ctx=null, master=null;
+const players=new Map(); // padId -> player
+const deckGains=[];
+function deckNode(d){ensureCtx();if(!deckGains[d]){const g=ctx.createGain();g.gain.value=S.decks[d].vol;g.connect(master);deckGains[d]=g}return deckGains[d]}
+function setDeckVol(d,v){S.decks[d].vol=v;if(deckGains[d]&&ctx)deckGains[d].gain.setTargetAtTime(v,ctx.currentTime,0.03);saveSoon()}
+function ensureCtx(){if(!ctx){const C=window.AudioContext||window.webkitAudioContext;ctx=new C();master=ctx.createGain();master.gain.value=S.masterVolume;master.connect(ctx.destination);ctx.onstatechange=paintAudio}return ctx}
+function paintAudio(){const p=$('#audioPill');const on=ctx&&ctx.state==='running';p.textContent=on?'Som ativo':'Som: toque';p.title=on?'':'O iPad só libera o som depois de um toque na tela';p.className='pill '+(on?'ok':'warn')}
+function unlock(){ensureCtx();if(ctx.state!=='running'){ctx.resume().then(paintAudio).catch(()=>{});
+  try{const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)}catch(e){}}
+  wake()}
+document.addEventListener('pointerdown',unlock,{capture:true});
+document.addEventListener('keydown',unlock,{capture:true});
+let lock=null;
+function wake(){if(lock||!('wakeLock' in navigator))return;navigator.wakeLock.request('screen').then(l=>{lock=l;l.addEventListener('release',()=>{lock=null})}).catch(()=>{})}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&players.size)wake()});
+
+// Tap cycle: idle -> CUE, CUE -> PLAY, PLAY -> STOP. Tapping another pad stops what is playing and cues the new one.
+// Each window (deck) is exclusive inside itself; different windows play on top of each other.
+function tap(pad,d=S.active){
+  if(!pad)return;setActive(d);const dk=S.decks[d];
+  if(pad.missing){relink(pad);return}
+  if(isLive(pad.id)){stopPad(pad);if(dk.cue===pad.id)dk.cue=null;paint();return}
+  if(dk.cue===pad.id){play(pad,d);return}
+  stopOthers(d,null);dk.cue=pad.id;paint();
+}
+function play(pad,d=S.active){if(!pad||pad.missing){if(pad)relink(pad);return}const dk=S.decks[d];stopOthers(d,pad.id);if(dk.cue===pad.id)dk.cue=null;if(!isLive(pad.id))start(pad,d);else{const pl=players.get(pad.id);if(pl.deck!==d){try{pl.g.disconnect();pl.g.connect(deckNode(d))}catch(e){}pl.deck=d}paint()}}
+function stopTime(pad,mode){return (mode||pad.stopMode)==='fade'?(pad.fadeOut>0?pad.fadeOut:2):0.03}
+function stopPad(pad,mode){const pl=players.get(pad.id);if(pl&&!pl.stopping)fadeOutPlayer(pl,stopTime(pad,mode))}
+function stopOthers(d,exceptId){players.forEach((pl,id)=>{if(id!==exceptId&&pl.deck===d&&!pl.stopping){const p=padById(id);if(p)stopPad(p);else fadeOutPlayer(pl,0.03)}})}
+function start(pad,d=S.active){
+  const url=urlFor(pad.fileKey);if(!url)return;
+  ensureCtx();if(ctx.state!=='running')ctx.resume().catch(()=>{});
+  const el=new Audio();el.src=url;el.preload='auto';el.setAttribute('playsinline','');
+  el.playbackRate=pad.speed||1;try{el.preservesPitch=true;el.webkitPreservesPitch=true}catch(e){}
+  const src=ctx.createMediaElementSource(el),g=ctx.createGain();g.gain.value=0;src.connect(g);g.connect(deckNode(d));
+  const p={padId:pad.id,deck:d,el,src,g,stopping:false,fading:false,started:false};
+  players.set(pad.id,p);
+  const fin=Math.max(0.01,pad.fadeIn||0);
+  let begun=false;
+  const begin=()=>{if(begun||p.stopping)return;begun=true;p.started=true;const now=ctx.currentTime;
+    g.gain.cancelScheduledValues(now);g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(pad.volume,now+fin)};
+  const seek=()=>{if(pad.inPoint>0.01){el.addEventListener('seeked',begin,{once:true});try{el.currentTime=pad.inPoint}catch(e){}setTimeout(begin,500)}else begin()};
+  if(el.readyState>=1)seek();else el.addEventListener('loadedmetadata',seek,{once:true});
+  el.play().catch(()=>{toast('O iPad segurou o som. Toque uma vez na tela e tente de novo.');fadeOutPlayer(p,0.01)});
+  wake();paint();
+}
+function kill(p){try{p.el.pause()}catch(e){}try{p.src.disconnect();p.g.disconnect()}catch(e){}try{p.el.removeAttribute('src');p.el.load()}catch(e){}}
+function fadeOutPlayer(p,s){
+  if(p.stopping)return;p.stopping=true;
+  if(ctx){const now=ctx.currentTime,v=p.g.gain.value;p.g.gain.cancelScheduledValues(now);p.g.gain.setValueAtTime(v,now);p.g.gain.linearRampToValueAtTime(0,now+s)}
+  setTimeout(()=>{kill(p);if(players.get(p.padId)===p)players.delete(p.padId);paint()},s*1000+80);
+  paint();
+}
+function stopAll(s=0.08){[...players.values()].forEach(p=>fadeOutPlayer(p,s));S.decks.forEach(d=>d.cue=null);paint()}
+let fadeT=null;
+function fadeAll(){stopAll(3);const b=$('#fadeAll');b.classList.remove('busy');void b.offsetWidth;b.classList.add('busy');clearTimeout(fadeT);fadeT=setTimeout(()=>b.classList.remove('busy'),3000)}
+function isLive(id){const p=players.get(id);return !!(p&&!p.stopping)}
+
+function tick(){
+  for(const p of [...players.values()]){
+    const pad=padById(p.padId);
+    if(!pad){fadeOutPlayer(p,0.05);continue}
+    if(!p.started||p.stopping)continue;
+    const dur=p.el.duration||pad.duration||0;
+    const out=pad.outPoint>0?Math.min(pad.outPoint,dur||pad.outPoint):dur;
+    const ct=p.el.currentTime;if(!out)continue;
+    if(pad.loop){if(ct>=out-0.02||p.el.ended){try{p.el.currentTime=pad.inPoint||0}catch(e){}if(p.el.paused)p.el.play().catch(()=>{})}continue}
+    const remain=(out-ct)/(pad.speed||1);
+    if(!p.fading&&pad.fadeOut>0&&remain<=pad.fadeOut){p.fading=true;const now=ctx.currentTime;
+      p.g.gain.cancelScheduledValues(now);p.g.gain.setValueAtTime(p.g.gain.value,now);p.g.gain.linearRampToValueAtTime(0,now+Math.max(0.01,remain))}
+    if(ct>=out-0.01||p.el.ended)fadeOutPlayer(p,0.03);
+  }
+}
+setInterval(tick,40);
+
+/* ---------- Vertical pill sliders ---------- */
+const VS={};
+function vsHTML(id,cfg){VS[id]=cfg;const v=cfg.get(),h=(v-cfg.min)/(cfg.max-cfg.min)*100;
+  return `<div class="vs" id="vs-${id}" data-vs="${id}" role="slider" tabindex="0" aria-orientation="vertical" aria-label="${esc(cfg.label)}" aria-valuemin="${cfg.min}" aria-valuemax="${cfg.max}" aria-valuenow="${v}" aria-valuetext="${cfg.fmt(v)}">
+    <div class="vsf" style="height:${h}%"></div><span class="vsv">${cfg.fmt(v)}</span>${ICON[cfg.icon]||''}</div>`}
+function vsSet(id,v){const c=VS[id];if(!c)return;v=Math.min(c.max,Math.max(c.min,Math.round(v/c.step)*c.step));v=+v.toFixed(4);if(v!==c.get())c.set(v);vsPaint(id)}
+function vsPaint(id){const c=VS[id],el=document.getElementById('vs-'+id);if(!c||!el)return;const v=c.get();
+  el.querySelector('.vsf').style.height=((v-c.min)/(c.max-c.min)*100)+'%';el.querySelector('.vsv').textContent=c.fmt(v);
+  el.setAttribute('aria-valuenow',v);el.setAttribute('aria-valuetext',c.fmt(v))}
+document.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('.vs');if(!el)return;const id=el.dataset.vs,c=VS[id];if(!c)return;e.preventDefault();
+  try{el.setPointerCapture(e.pointerId)}catch(_){}
+  const y0=e.clientY,v0=c.get(),h=el.getBoundingClientRect().height;el.classList.add('drag');
+  const mv=ev=>vsSet(id,v0+(y0-ev.clientY)/h*(c.max-c.min));
+  const up=()=>{el.classList.remove('drag');el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up)};
+  el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+});
+document.addEventListener('keydown',e=>{
+  const el=e.target.closest&&e.target.closest('.vs');if(!el)return;const c=VS[el.dataset.vs];if(!c)return;
+  const d={ArrowUp:1,ArrowRight:1,ArrowDown:-1,ArrowLeft:-1}[e.key];if(d){e.preventDefault();vsSet(el.dataset.vs,c.get()+d*c.kstep)}
+});
+
+/* ---------- Import ---------- */
+async function analyse(blob){
+  let duration=0,peaks=null;
+  if(blob.size<80e6){try{ensureCtx();const ab=await blob.arrayBuffer();
+    const buf=await new Promise((res,rej)=>{const r=ctx.decodeAudioData(ab,res,rej);if(r&&r.then)r.then(res,rej)});
+    duration=buf.duration;peaks=peaksOf(buf)}catch(e){}}
+  if(!duration)duration=await new Promise(res=>{const a=new Audio();const u=URL.createObjectURL(blob);a.preload='metadata';a.src=u;
+    const done=v=>{URL.revokeObjectURL(u);res(v)};a.onloadedmetadata=()=>done(isFinite(a.duration)?a.duration:0);a.onerror=()=>done(0);setTimeout(()=>done(0),6000)});
+  return {duration,peaks};
+}
+function peaksOf(buf,n=300){const d=buf.getChannelData(0),step=Math.max(1,Math.floor(d.length/n)),out=[];
+  for(let i=0;i<n;i++){let m=0;const s=i*step,e=Math.min(d.length,s+step);for(let j=s;j<e;j+=16){const v=Math.abs(d[j]);if(v>m)m=v}out.push(+m.toFixed(3))}return out}
+function newPad(bank,slot,name,fileKey,meta){return{id:uid(),bank,slot,name,fileKey,color:COLORS[0],volume:1,fadeIn:0,fadeOut:0,xfTime:1.5,speed:1,loop:false,stopMode:'cut',inPoint:0,outPoint:0,duration:meta.duration||0,peaks:meta.peaks}}
+const isAudio=f=>(f.type||'').startsWith('audio')||/\.(mp3|m4a|aac|wav|aiff?|flac|caf|ogg|opus)$/i.test(f.name||'');
+function nextFree(bank,slot){for(let i=bank*PADS_PER_BANK+slot;i<BANKS*PADS_PER_BANK;i++){const b=Math.floor(i/PADS_PER_BANK),s=i%PADS_PER_BANK;if(!padAt(b,s))return[b,s]}return null}
+async function attach(p,blob,keep,recalc){
+  const u=urls.get(p.fileKey);if(u){URL.revokeObjectURL(u);urls.delete(p.fileKey)}
+  blobs.set(p.fileKey,blob);p.missing=false;p.keep=keep!==false;
+  if(p.keep){const ok=await idbPut('files',p.fileKey,blob);if(!ok&&storeOk){storeOk=false;paintStore()}}
+  if(recalc||!p.duration){const m=await analyse(blob);p.duration=m.duration;p.peaks=m.peaks;p.inPoint=Math.min(p.inPoint||0,m.duration);if(p.outPoint>m.duration)p.outPoint=0}
+}
+async function addBlob(bank,slot,blob,name,fileName,keep,extra){
+  const pos=nextFree(bank,slot);if(!pos){toast('Todos os 144 pads estão ocupados.');return null}
+  const meta=await analyse(blob);
+  const p=Object.assign(newPad(pos[0],pos[1],name,uid(),meta),{fileName},extra||{});
+  await attach(p,blob,keep);S.pads.push(p);renderGrid();saveSoon();return pos;
+}
+async function importFiles(bank,slot,files,keep=true){
+  files=[...files].filter(isAudio);
+  if(!files.length){toast('Nenhum arquivo de áudio encontrado.');return}
+  toast('Importando '+files.length+(files.length>1?' músicas…':' música…'));
+  let added=0,relinked=0,pos=[bank,slot];
+  for(const f of files){
+    const m=S.pads.find(p=>p.missing&&p.fileName===f.name);
+    if(m){await attach(m,f,keep);relinked++;continue}
+    const r=await addBlob(pos[0],pos[1],f,f.name.replace(/\.[^.]+$/,''),f.name,keep);if(!r)break;
+    added++;pos=[r[0],r[1]+1];if(pos[1]>=PADS_PER_BANK)pos=[pos[0]+1,0];if(pos[0]>=BANKS)break;
+  }
+  renderGrid();saveSoon();
+  toast([added?added+(added>1?' pads preenchidos':' pad preenchido'):'',relinked?relinked+' reconectado'+(relinked>1?'s':''):''].filter(Boolean).join(', ')+'.');
+}
+let pickTarget=null;
+$('#picker').addEventListener('change',async e=>{
+  const f=[...(e.target.files||[])],pt=pickTarget;e.target.value='';e.target.multiple=true;
+  if(!pt||!f||!f.length)return;
+  if(pt.relink||pt.replace){const p=padById(pt.relink||pt.replace);if(!p)return;
+    if(pt.replace){const cur=players.get(p.id);if(cur)fadeOutPlayer(cur,0.05);p.fileKey=uid();p.driveId=null}
+    await attach(p,f[0],pt.replace?true:p.keep,!!pt.replace);p.fileName=f[0].name;
+    if(pt.replace)p.name=f[0].name.replace(/\.[^.]+$/,'');
+    renderGrid();saveSoon();if(S.editing===p.id)openEditor(p.id);toast((pt.replace?'Arquivo trocado: ':'Reconectado: ')+p.name);return}
+  importFiles(pt.bank,pt.slot,f,pt.keep);
+});
+async function relink(p){
+  if(p.driveId){toast('Baixando "'+p.name+'" do Google Drive…');
+    try{const blob=await driveDownload(p.driveId,p.driveMime);await attach(p,blob,p.keep);renderGrid();saveSoon();toast('Pronto: '+p.name)}catch(e){toast(driveErr(e))}
+    return}
+  pickTarget={relink:p.id};const el=$('#picker');el.multiple=false;el.click();
+}
+
+/* ---------- Add sheet ---------- */
+let addTarget=null;
+function openAdd(bank,slot){addTarget={bank,slot};$('#addPick').hidden=false;$('#addDrive').hidden=true;$('#add').hidden=false}
+function closeAdd(){$('#add').hidden=true}
+if(!(window.claude&&typeof window.claude.use==='function')){const d=$('#srcDrive');if(d){d.hidden=true;d.parentElement.style.gridTemplateColumns='1fr'}}
+$('#srcFiles').onclick=()=>{if(!addTarget)return;pickTarget={bank:addTarget.bank,slot:addTarget.slot,keep:$('#keepCopy').checked};closeAdd();const p=$('#picker');p.multiple=true;p.click()};
+$('#srcDrive').onclick=()=>{$('#addPick').hidden=true;$('#addDrive').hidden=false;driveSearch('')};
+$('#dback').onclick=()=>{$('#addPick').hidden=false;$('#addDrive').hidden=true};
+$('#dgo').onclick=()=>driveSearch($('#dq').value.trim());
+$('#dq').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();driveSearch(e.target.value.trim())}});
+$('#addClose').onclick=closeAdd;
+$('#add').addEventListener('click',e=>{if(e.target.id==='add')closeAdd()});
+
+/* ---------- Google Drive through the viewer's Claude connector ---------- */
+const DRIVE='Google Drive', DRIVE_MAX=60e6;
+let mcpP=null;
+function getMcp(){if(!mcpP)mcpP=(window.claude&&typeof window.claude.use==='function')?window.claude.use('mcp').catch(()=>null):Promise.resolve(null);return mcpP}
+function driveErr(e){const c=e&&e.code;return({
+  needs_reauth:'A conexão com o Google Drive expirou. Reconecte em claude.ai › Configurações › Conectores.',
+  server_not_connected:'Google Drive não está conectado. Adicione em claude.ai › Configurações › Conectores.',
+  selection_required:'Você tem mais de uma conta do Google Drive. Escolha uma no aviso do Claude.',
+  server_not_found:'O conector do Google Drive não existe mais. Adicione de novo em claude.ai › Configurações › Conectores.',
+  not_in_manifest:'O acesso ao Google Drive foi recusado para esta página. Recarregue para ser perguntado de novo.',
+  blocked_by_policy:'Sua organização bloqueou este acesso ao Google Drive.',
+  approval_required:'Sua organização exige aprovação para este acesso ao Google Drive.',
+  server_unavailable:'O Google Drive não respondeu a tempo. Tente de novo em alguns segundos.',
+  not_granted:'Esta visualização não tem acesso a conectores. Abra a página no app ou no site do Claude.',
+  capability_disabled:'Esta visualização não tem acesso a conectores. Abra a página no app ou no site do Claude.',
+  capability_removed:'Esta visualização não tem acesso a conectores. Abra a página no app ou no site do Claude.',
+  tool_error:'O Google Drive recusou: '+((e&&e.message)||'erro sem detalhe'),
+  bad_format:'O Drive devolveu um formato que o Lumia não reconheceu para este arquivo.'
+})[c]||('Falha ao falar com o Google Drive'+(c?' ('+c+')':'')+'.')}
+async function callDrive(tool,input,opts){
+  const mcp=await getMcp();if(!mcp)throw{code:'not_granted'};
+  try{return await mcp.callTool(DRIVE,tool,input,opts)}
+  catch(e){if(e&&e.retryable&&tool==='search_files'){await new Promise(r=>setTimeout(r,(e.retryAfterMs||1200)+Math.random()*600));return await mcp.callTool(DRIVE,tool,input,opts)}throw e}
+}
+async function driveSearch(q){
+  const st=$('#dstate'),list=$('#dlist');list.innerHTML='';st.textContent='Buscando no Google Drive…';
+  let query="mimeType contains 'audio/'";if(q)query+=" and title contains '"+q.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";
+  try{
+    const r=await callDrive('search_files',{query,pageSize:40,excludeContentSnippets:true});
+    const p=r&&r.payload;const files=(p&&Array.isArray(p.files))?p.files:[];
+    if(!files.length){st.textContent=q?'Nenhum áudio com "'+q+'" no nome.':'Nenhum arquivo de áudio encontrado no seu Drive.';return}
+    st.textContent=files.length+' arquivo'+(files.length>1?'s':'')+' de áudio. Toque para baixar no próximo pad livre.';
+    list.innerHTML=files.map(x=>{const mb=(+x.fileSize||0)/1e6,big=+x.fileSize>DRIVE_MAX;
+      return `<button class="dfile" data-id="${esc(x.id)}" data-mime="${esc(x.mimeType||'')}" data-title="${esc(x.title||'sem nome')}" ${big?'disabled':''}><b>${esc(x.title||'sem nome')}</b><span>${big?'grande demais':(mb?mb.toFixed(1)+' MB':'')}</span></button>`}).join('');
+  }catch(e){st.textContent=driveErr(e)}
+}
+function findB64(x){let best='';const walk=(v,d)=>{if(v==null||d>7)return;if(typeof v==='string'){if(v.length>best.length)best=v;return}
+  if(Array.isArray(v)){v.forEach(i=>walk(i,d+1));return}if(typeof v==='object')Object.values(v).forEach(i=>walk(i,d+1))};walk(x,0);return best}
+async function driveDownload(id,mime){
+  const r=await callDrive('download_file_content',{fileId:id},{cache:false});
+  let b=findB64(r).replace(/^data:[^,]*,/,'').replace(/\s+/g,'');
+  if(b.length<64||!/^[A-Za-z0-9+/_-]+=*$/.test(b.slice(0,4000)))throw{code:'bad_format'};
+  b=b.replace(/-/g,'+').replace(/_/g,'/');
+  const bin=atob(b),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+  return new Blob([u8],{type:(mime||'audio/mpeg').replace('audio/x-wav','audio/wav')});
+}
+$('#dlist').addEventListener('click',async e=>{
+  const b=e.target.closest('.dfile');if(!b||b.disabled||!addTarget)return;
+  b.classList.add('busy');b.disabled=true;const tag=b.querySelector('span'),was=tag.textContent;tag.textContent='baixando…';
+  try{const blob=await driveDownload(b.dataset.id,b.dataset.mime);const title=b.dataset.title;
+    const pos=await addBlob(addTarget.bank,addTarget.slot,blob,title.replace(/\.[^.]+$/,''),title,$('#keepCopy').checked,{driveId:b.dataset.id,driveMime:b.dataset.mime});
+    if(pos){addTarget={bank:pos[0],slot:pos[1]+1};tag.textContent='no pad '+BANK_NAMES[pos[0]]+(pos[1]+1);toast('Adicionada: '+title)}else{tag.textContent=was;b.disabled=false}
+  }catch(err){tag.textContent=was;b.disabled=false;$('#dstate').textContent=driveErr(err)}
+  b.classList.remove('busy');
+});
+
+/* ---------- Pad grid ---------- */
+function padHTML(p,s){
+  const out=p.outPoint>0?p.outPoint:p.duration,len=Math.max(0,out-(p.inPoint||0))/(p.speed||1);
+  return `<div class="pad ${p.missing?'missing':''}" role="button" tabindex="0" data-pad="${p.id}" style="--c:${p.color}">
+      <div class="prog" data-prog="${p.id}"></div><div class="tint"></div>
+      <span class="pname">${esc(p.name)}</span><span class="cuetag">CUE</span>
+      <button class="more" data-more="${p.id}" aria-label="Abrir controles do pad">⋯</button>
+      <div class="pmeta"><div class="pleft"><button class="lp ${p.loop?'on':''}" data-loop="${p.id}" aria-pressed="${!!p.loop}" aria-label="Loop ${p.loop?'ligado':'desligado'}">LOOP <b>${p.loop?'ON':'OFF'}</b></button>
+        <span class="ptime" data-ptime="${p.id}">${p.missing?(p.driveId?'baixar de novo':'reconectar'):fmt(len)}</span></div>
+        <span class="ptags">${p.stopMode==='fade'?'fade':''} <span>${s+1}</span></span></div></div>`}
+function renderGrid(){
+  const box=$('#decks'),multi=S.nDecks>1;
+  box.className='decks n'+S.nDecks+(multi?' multi':'');
+  let h='';
+  for(let d=0;d<S.nDecks;d++){
+    const bank=S.decks[d].bank;
+    h+=`<section class="deck ${multi&&d===S.active?'active':''}" data-deck="${d}" aria-label="Janela ${d+1}"><div class="dvol"><label for="vs-dv${d}">J${d+1}</label>${vsHTML('dv'+d,{label:'Master da janela '+(d+1),icon:'vol',min:0,max:1,step:0.01,kstep:0.05,fmt:pct,get:()=>S.decks[d].vol,set:v=>setDeckVol(d,v)})}</div><div class="grid">`;
+    for(let s=0;s<PADS_PER_BANK;s++){
+      const p=padAt(bank,s);
+      h+=p?padHTML(p,s):`<button class="pad empty" data-slot="${s}" aria-label="Adicionar música no pad ${BANK_NAMES[bank]}${s+1}"><span><b>+</b>${BANK_NAMES[bank]}${s+1}</span></button>`;
+    }
+    h+=`</div><nav class="banks" aria-label="Bancos da janela ${d+1}"><span class="dlabel">J${d+1}</span>`+
+      [...BANK_NAMES].map((n,i)=>`<button class="bank ${i===bank?'on':''}" data-bank="${i}" aria-pressed="${i===bank}">${multi?n:'BANCO '+n}<span class="dot" data-bdot="${i}" hidden></span></button>`).join('')+
+      `</nav></section>`;
+    if(d<S.nDecks-1)h+=`<div class="split" data-split="${d}" role="separator" aria-orientation="vertical" aria-label="Arraste para redimensionar as janelas ${d+1} e ${d+2}. Toque duas vezes para igualar."><i></i></div>`;
+  }
+  box.innerHTML=h;applyWidths();fitAll();
+  document.querySelectorAll('#wins button').forEach(b=>b.classList.toggle('on',+b.dataset.win===S.nDecks));
+  paint();
+}
+const renderBanks=()=>{};
+function paint(){
+  document.querySelectorAll('#decks .pad[data-pad]').forEach(el=>{const pl=players.get(el.dataset.pad);const d=+el.closest('[data-deck]').dataset.deck;
+    const live=!!(pl&&!pl.stopping);
+    el.classList.toggle('live',live);el.classList.toggle('fading',!!(pl&&pl.stopping));el.classList.toggle('cued',S.decks[d].cue===el.dataset.pad&&!live);
+    if(!pl){const pr=el.querySelector('.prog');if(pr)pr.style.width='0';const p=padById(el.dataset.pad),t=el.querySelector('.ptime');
+      if(p&&t&&!p.missing){const out=p.outPoint>0?p.outPoint:p.duration;t.textContent=fmt(Math.max(0,out-(p.inPoint||0))/(p.speed||1))}}});
+  const liveBanks=new Set();players.forEach(p=>{if(!p.stopping){const pad=padById(p.padId);if(pad)liveBanks.add(pad.bank)}});
+  document.querySelectorAll('[data-bdot]').forEach(d=>{d.hidden=!liveBanks.has(+d.dataset.bdot)});
+  document.querySelectorAll('#decks .deck').forEach(el=>el.classList.toggle('active',S.nDecks>1&&+el.dataset.deck===S.active));
+  const ep=S.editing&&padById(S.editing),pb=$('#e-play');
+  if(ep&&pb){const l=isLive(ep.id);pb.classList.toggle('live',l);pb.textContent=l?'Tocando':'▶ Play';$('#e-stopcut').disabled=!l;$('#e-stopfade').disabled=!l}
+}
+function setActive(d){if(d===S.active)return;S.active=d;paint()}
+function setBank(b,d=S.active){b=Math.max(0,Math.min(BANKS-1,b));const dk=S.decks[d];if(b===dk.bank)return;dk.bank=b;renderGrid();saveSoon()}
+function setWins(n){n=Math.max(1,Math.min(3,n));if(n===S.nDecks)return;
+  // pads playing from a window that closes keep playing; they just lose their window.
+  S.nDecks=n;if(S.active>=n)S.active=0;renderGrid();saveSoon()}
+$('#wins').addEventListener('click',e=>{const b=e.target.closest('[data-win]');if(b)setWins(+b.dataset.win)});
+
+// Tap = cue/play/stop. Hold 0.5 s or tap ⋯ = open the pad window.
+let hold=null,held=false;
+const decks=$('#decks');
+const deckOf=el=>+el.closest('[data-deck]').dataset.deck;
+decks.addEventListener('pointerdown',e=>{
+  const dk=e.target.closest('[data-deck]');if(dk)setActive(+dk.dataset.deck);
+  const el=e.target.closest('.pad[data-pad]');if(!el||e.target.closest('.more,.lp'))return;held=false;
+  const x0=e.clientX,y0=e.clientY;clearTimeout(hold);
+  hold=setTimeout(()=>{held=true;openEditor(el.dataset.pad)},500);
+  const cancel=ev=>{if(ev.type==='pointermove'&&Math.hypot(ev.clientX-x0,ev.clientY-y0)<10)return;clearTimeout(hold);el.removeEventListener('pointermove',cancel);el.removeEventListener('pointerup',cancel);el.removeEventListener('pointercancel',cancel)};
+  el.addEventListener('pointermove',cancel);el.addEventListener('pointerup',cancel);el.addEventListener('pointercancel',cancel);
+});
+decks.addEventListener('contextmenu',e=>{if(e.target.closest('.pad'))e.preventDefault()});
+decks.addEventListener('click',e=>{
+  const bk=e.target.closest('[data-bank]');if(bk){setBank(+bk.dataset.bank,deckOf(bk));return}
+  const more=e.target.closest('[data-more]');if(more){e.stopPropagation();openEditor(more.dataset.more);return}
+  const lp=e.target.closest('[data-loop]');if(lp){e.stopPropagation();toggleLoop(padById(lp.dataset.loop));return}
+  const empty=e.target.closest('.pad.empty');if(empty){const d=deckOf(empty);openAdd(S.decks[d].bank,+empty.dataset.slot);return}
+  const el=e.target.closest('.pad[data-pad]');if(!el)return;
+  if(held){held=false;return}
+  tap(padById(el.dataset.pad),deckOf(el));
+});
+decks.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('.pad[data-pad]')){e.preventDefault();tap(padById(e.target.dataset.pad),deckOf(e.target))}});
+decks.addEventListener('dragover',e=>{const c=e.target.closest('.pad.empty');if(c){e.preventDefault();c.classList.add('drop')}});
+decks.addEventListener('dragleave',e=>{const c=e.target.closest('.pad.empty');if(c)c.classList.remove('drop')});
+decks.addEventListener('drop',e=>{const c=e.target.closest('.pad.empty');if(!c)return;e.preventDefault();if(e.dataTransfer.files.length)importFiles(S.decks[deckOf(c)].bank,+c.dataset.slot,e.dataTransfer.files,true)});
+
+
+/* ---------- Resizable windows ---------- */
+const MIN_DECK=190;
+function widths(){const n=S.nDecks;let w=S.widths&&S.widths[n];if(!w||w.length!==n)w=Array(n).fill(1);return w}
+function applyWidths(){const box=$('#decks');if(S.nDecks<2){box.style.gridTemplateColumns='';return}
+  box.style.gridTemplateColumns=widths().map(x=>`minmax(0,${x}fr)`).join(' 14px ')}
+// Pick the pad arrangement (24 pads) whose pads are closest to a comfortable shape for the space.
+const SHAPES=[[8,3],[6,4],[4,6],[3,8],[2,12]];
+function fitGrid(g){const w=g.clientWidth,h=g.clientHeight;if(!w||!h)return;
+  let best=null,score=1e9;for(const [c,r] of SHAPES){const pw=(w-(c-1)*8)/c,ph=(h-(r-1)*8)/r;if(pw<54||ph<46)continue;
+    const sc=Math.abs(Math.log((pw/ph)/1.25));if(sc<score){score=sc;best=[c,r,pw,ph]}}
+  if(!best){const c=2,r=12;best=[c,r,(w-8)/2,(h-88)/12]}
+  g.style.setProperty('--gc',best[0]);g.style.setProperty('--gr',best[1]);
+  const dk=g.closest('.deck');dk.classList.toggle('dense',best[2]<150||best[3]<110);dk.classList.toggle('tiny',best[2]<96||best[3]<70)}
+const ro=('ResizeObserver' in window)?new ResizeObserver(es=>es.forEach(e=>fitGrid(e.target))):null;
+function fitAll(){document.querySelectorAll('#decks .grid').forEach(g=>{fitGrid(g);if(ro)ro.observe(g)})}
+window.addEventListener('resize',fitAll);
+$('#decks').addEventListener('pointerdown',e=>{
+  const sp=e.target.closest('.split');if(!sp)return;e.preventDefault();e.stopPropagation();
+  const i=+sp.dataset.split,secs=[...document.querySelectorAll('#decks .deck')];
+  const px=secs.map(x=>x.getBoundingClientRect().width),x0=e.clientX,a0=px[i],b0=px[i+1];
+  try{sp.setPointerCapture(e.pointerId)}catch(_){}sp.classList.add('drag');
+  const mv=ev=>{let a=a0+(ev.clientX-x0);a=Math.max(MIN_DECK,Math.min(a0+b0-MIN_DECK,a));const cur=px.slice();cur[i]=a;cur[i+1]=a0+b0-a;
+    const tot=cur.reduce((x,y)=>x+y,0);S.widths=S.widths||{};S.widths[S.nDecks]=cur.map(x=>+(x/tot*S.nDecks).toFixed(4));applyWidths();fitAll()};
+  const up=ev=>{const now=Date.now();if(Math.abs(ev.clientX-x0)<6){if(now-(sp._t||0)<350&&S.widths){delete S.widths[S.nDecks];applyWidths();fitAll()}sp._t=now}
+    sp.classList.remove('drag');sp.removeEventListener('pointermove',mv);sp.removeEventListener('pointerup',up);sp.removeEventListener('pointercancel',up);saveSoon()};
+  sp.addEventListener('pointermove',mv);sp.addEventListener('pointerup',up);sp.addEventListener('pointercancel',up);
+},true);
+$('#decks').addEventListener('dblclick',e=>{if(!e.target.closest('.split'))return;if(S.widths)delete S.widths[S.nDecks];applyWidths();fitAll();saveSoon()});
+
+/* ---------- Loop toggle (pad button, window, MIDI) ---------- */
+function toggleLoop(p){if(!p)return;p.loop=!p.loop;paintLoop(p);saveSoon()}
+function paintLoop(p){document.querySelectorAll(`[data-loop="${p.id}"]`).forEach(lp=>{
+  lp.classList.toggle('on',p.loop);lp.setAttribute('aria-pressed',p.loop);lp.setAttribute('aria-label','Loop '+(p.loop?'ligado':'desligado'));lp.querySelector('b').textContent=p.loop?'ON':'OFF'})
+  if(S.editing===p.id)segSet('#e-loop',p.loop?'1':'0')}
+
+/* ---------- MIDI: Korg nanoKONTROL2, factory CC map, channel 1 ---------- */
+let midiStatus='checking',midiNames=[];
+function focusPad(){for(const [id,pl] of players){if(!pl.stopping&&pl.deck===S.active)return padById(id)}return D().cue?padById(D().cue):null}
+function paintMidi(){
+  const pill=$('#midiPill'),box=$('#midiState');
+  const ok=midiStatus==='ok'&&midiNames.length;
+  pill.textContent=ok?'MIDI ✓':'MIDI –';pill.className='pill '+(ok?'ok':'warn');
+  const msg={
+    checking:'Verificando MIDI…',
+    unsupported:'Este navegador não tem MIDI. O Safari do iPad (e qualquer navegador no iPad) não oferece a Web MIDI API, então o nanoKONTROL não chega até a página. No iPad, o MIDI só funciona com o Lumia empacotado como app nativo.',
+    blocked:'O navegador tem MIDI, mas bloqueou o acesso para esta página. Dentro do Claude a página roda num quadro protegido que pode não liberar MIDI.',
+    ok:ok?'Conectado: '+midiNames.join(', '):'MIDI liberado, mas nenhum controlador conectado. Ligue o nanoKONTROL2.'
+  }[midiStatus];
+  box.textContent=msg;box.className='midi-state '+(ok?'ok':'warn');
+}
+async function midiInit(){
+  if(typeof navigator.requestMIDIAccess!=='function'){midiStatus='unsupported';paintMidi();return}
+  try{
+    const acc=await navigator.requestMIDIAccess({sysex:false});midiStatus='ok';
+    const bind=()=>{midiNames=[];acc.inputs.forEach(i=>{i.onmidimessage=onMidi;if(i.state!=='disconnected')midiNames.push(i.name||'MIDI')});paintMidi()};
+    acc.onstatechange=bind;bind();
+  }catch(e){midiStatus='blocked';paintMidi()}
+}
+const midiHeld=new Set();
+function onMidi(ev){
+  const d=ev.data;if(!d||d.length<3)return;const type=d[0]&0xf0,ch=(d[0]&0x0f)+1,n=d[1],v=d[2];
+  $('#midiLast').textContent='Última mensagem: '+(type===0xB0?'CC '+n:type===0x90?'Nota '+n:'Tipo '+type)+' = '+v+' · canal '+ch;
+  if(type!==0xB0)return;
+  // continuous controls
+  const scale=(lo,hi)=>lo+(v/127)*(hi-lo);
+  if(n===7){vsSet('master',v/127);return}
+  if(n>=4&&n<=6){const d=n-4;S.decks[d].vol=+(v/127).toFixed(2);setDeckVol(d,S.decks[d].vol);vsPaint('dv'+d);return}
+  const fp=()=>focusPad();
+  if(n===0){const p=fp();if(!p)return;p.volume=+(v/127).toFixed(2);const pl=players.get(p.id);if(pl&&!pl.stopping&&!pl.fading&&ctx)pl.g.gain.setTargetAtTime(p.volume,ctx.currentTime,0.03);if(S.editing===p.id)vsPaint('e-vol');saveSoon();return}
+  if(n===16||n===17){const p=fp();if(!p)return;const k=n===16?'fadeIn':'fadeOut';p[k]=+(Math.round(scale(0,10)*10)/10).toFixed(1);if(S.editing===p.id)vsPaint(n===16?'e-fin':'e-fout');saveSoon();return}
+  // buttons: act on press only
+  if(v<64){midiHeld.delete(n);return}
+  if(midiHeld.has(n))return;midiHeld.add(n);
+  let idx=-1;if(n>=32&&n<=39)idx=n-32;else if(n>=48&&n<=55)idx=8+n-48;else if(n>=64&&n<=71)idx=16+n-64;
+  if(idx>=0){const p=padAt(D().bank,idx);if(p)tap(p,S.active);return}
+  const live=()=>{for(const [id,pl] of players){if(!pl.stopping&&pl.deck===S.active)return padById(id)}return null};
+  switch(n){
+    case 41:{const p=D().cue&&padById(D().cue);if(p)play(p,S.active);break}
+    case 42:{const p=live();if(p)stopPad(p,'cut');break}
+    case 43:{const p=live();if(p)stopPad(p,'fade');break}
+    case 44:fadeAll();break;
+    case 45:stopAll(0.03);break;
+    case 46:toggleLoop(fp());break;
+    case 58:case 59:moveCue(n===59?1:-1);break;
+    case 61:case 62:setBank(D().bank+(n===62?1:-1));break;
+    case 60:setActive((S.active+1)%S.nDecks);break;
+  }
+}
+function moveCue(dir){
+  const list=[...S.pads].filter(p=>!p.missing).sort((a,b)=>(a.bank*PADS_PER_BANK+a.slot)-(b.bank*PADS_PER_BANK+b.slot));if(!list.length)return;
+  const ref=D().cue?padById(D().cue):focusPad();let i=ref?list.indexOf(ref):-1;
+  i=i<0?(dir>0?0:list.length-1):Math.max(0,Math.min(list.length-1,i+dir));
+  const p=list[i];D().cue=p.id;if(p.bank!==D().bank)setBank(p.bank);else paint();
+}
+$('#midiPill').onclick=()=>{paintMidi();$('#midi').hidden=false};
+$('#midiClose').onclick=()=>{$('#midi').hidden=true};
+$('#midi').addEventListener('click',e=>{if(e.target.id==='midi')e.target.hidden=true});
+
+/* ---------- Pad editor window ---------- */
+function openEditor(id){
+  const p=padById(id);if(!p)return;S.editing=id;
+  ['e-vol','e-fin','e-fout','e-spd'].forEach(k=>delete VS[k]);
+  $('#e-slot').textContent=label(p);$('#e-name').value=p.name;
+  $('#e-colors').innerHTML=COLORS.map(c=>`<button data-color="${c}" style="--c:${c}" class="${c===p.color?'on':''}" aria-label="Cor ${c}"></button>`).join('');
+  $('#e-in').value=(+p.inPoint).toFixed(1);$('#e-out').value=(+p.outPoint).toFixed(1);$('#e-dur').textContent='de '+fmt(p.duration);
+  segSet('#e-loop',p.loop?'1':'0');segSet('#e-stopmode',p.stopMode||'cut');
+  const st=(lab,id,cfg)=>`<div class="strip"><label for="vs-${id}">${lab}</label>${vsHTML(id,cfg)}</div>`;
+  const live=()=>{const pl=players.get(p.id);return pl&&!pl.stopping?pl:null};
+  $('#e-mix').innerHTML=
+    st('Volume','e-vol',{label:'Volume do pad',icon:'vol',min:0,max:1,step:0.01,kstep:0.05,fmt:pct,get:()=>p.volume,set:v=>{p.volume=v;const pl=live();if(pl&&!pl.fading)pl.g.gain.setTargetAtTime(v,ctx.currentTime,0.03);saveSoon()}})+
+    st('Fade in','e-fin',{label:'Fade in',icon:'fin',min:0,max:10,step:0.1,kstep:0.5,fmt:secs,get:()=>p.fadeIn,set:v=>{p.fadeIn=v;saveSoon()}})+
+    st('Fade out','e-fout',{label:'Fade out',icon:'fout',min:0,max:10,step:0.1,kstep:0.5,fmt:secs,get:()=>p.fadeOut,set:v=>{p.fadeOut=v;saveSoon()}})+
+    st('Veloc.','e-spd',{label:'Velocidade',icon:'speed',min:0.5,max:2,step:0.01,kstep:0.05,fmt:mult,get:()=>p.speed,set:v=>{p.speed=v;const pl=live();if(pl)pl.el.playbackRate=v;saveSoon()}});
+  const del=$('#e-del');del.classList.remove('armed');del.textContent='Remover pad';
+  $('#ed').hidden=false;paint();requestAnimationFrame(()=>drawWave());
+}
+function closeEditor(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();$('#ed').hidden=true;S.editing=null;renderGrid()}
+function segSet(sel,v){document.querySelectorAll(sel+' button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))}
+const ed=$('#ed');
+ed.addEventListener('click',e=>{
+  if(e.target.id==='ed'){closeEditor();return}
+  const p=padById(S.editing);if(!p)return;const b=e.target.closest('button');if(!b)return;
+  if(b.id==='e-close'){closeEditor();return}
+  if(b.id==='e-play'){play(p,S.active);return}
+  if(b.id==='e-stopcut'){stopPad(p,'cut');return}
+  if(b.id==='e-stopfade'){stopPad(p,'fade');return}
+  if(b.dataset.color){p.color=b.dataset.color;document.querySelectorAll('#e-colors button').forEach(x=>x.classList.toggle('on',x===b));saveSoon();return}
+  const seg=b.closest('.seg');
+  if(seg){const v=b.dataset.v;segSet('#'+seg.id,v);
+    if(seg.id==='e-loop'){p.loop=v==='1';paintLoop(p)}if(seg.id==='e-stopmode')p.stopMode=v;saveSoon();return}
+  if(b.dataset.mark){const pl=players.get(p.id);if(!pl||pl.stopping){toast('Toque o pad para marcar na posição atual.');return}
+    const tm=+pl.el.currentTime.toFixed(1),f=b.dataset.mark;
+    if(f==='inPoint'&&p.outPoint&&tm>=p.outPoint-0.1)return;if(f==='outPoint'&&tm<=p.inPoint+0.1)return;
+    p[f]=tm;$(f==='inPoint'?'#e-in':'#e-out').value=tm.toFixed(1);drawWave();saveSoon();return}
+  if(b.id==='e-replace'){pickTarget={replace:p.id};const el=$('#picker');el.multiple=false;el.click();return}
+  if(b.id==='e-del'){armed(b,()=>{const pl=players.get(p.id);if(pl)fadeOutPlayer(pl,0.05);
+    const fk=p.fileKey;setTimeout(()=>gcFiles([fk]),0);
+    S.pads=S.pads.filter(x=>x!==p);closeEditor();saveSoon()});return}
+});
+ed.addEventListener('input',e=>{
+  const p=padById(S.editing);if(!p)return;
+  if(e.target.id==='e-name'){p.name=e.target.value.trim()||p.name;saveSoon();return}
+  const f=e.target.dataset.f;
+  if(f==='inPoint'||f==='outPoint'){let v=+e.target.value;if(!isFinite(v))return;
+    if(f==='inPoint')v=Math.max(0,Math.min(v,(p.outPoint||p.duration)-0.1));
+    if(f==='outPoint'){v=Math.max(0,v);if(v&&v<=p.inPoint+0.1)return;if(p.duration&&v>p.duration)v=0}
+    p[f]=v;drawWave();saveSoon()}
+});
+function armed(el,fn,msg){if(el.classList.contains('armed')){el.classList.remove('armed');fn();return}
+  el.classList.add('armed');const txt=el.textContent;el.textContent=msg||'Toque de novo para remover';
+  setTimeout(()=>{if(el.isConnected&&el.classList.contains('armed')){el.classList.remove('armed');el.textContent=txt}},3000)}
+
+function drawWave(pos){
+  const cv=$('#wave');const p=padById(S.editing);if(!cv||!p||$('#ed').hidden)return;
+  const dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr)}
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+  const d=p.duration||1,x=s=>s/d*w,inX=x(p.inPoint||0),outX=x(p.outPoint>0?p.outPoint:d);
+  g.fillStyle='rgba(218,218,222,.07)';g.fillRect(inX,0,outX-inX,h);
+  const pk=p.peaks||[];
+  if(pk.length){const bw=w/pk.length;pk.forEach((v,i)=>{const bh=Math.max(1,v*(h-16));const bx=i*bw;g.fillStyle=(bx>=inX&&bx<=outX)?p.color:'#3a3d47';g.fillRect(bx,(h-bh)/2,Math.max(1,bw-1),bh)})}
+  else{g.fillStyle='#3a3d47';g.fillRect(0,h/2-1,w,2)}
+  g.fillStyle='#f2b33d';g.fillRect(inX-1.5,0,3,h);g.fillRect(outX-1.5,0,3,h);
+  g.font='600 11px "JetBrains Mono",monospace';g.fillText('IN',Math.min(inX+5,w-20),14);g.fillText('OUT',Math.max(outX-28,2),h-6);
+  if(pos!=null){g.fillStyle='#ffffff';g.fillRect(x(pos)-1,0,2,h)}
+}
+ed.addEventListener('pointerdown',e=>{
+  if(e.target.id!=='wave')return;const p=padById(S.editing);if(!p||!p.duration)return;
+  const r=e.target.getBoundingClientRect(),s=+((e.clientX-r.left)/r.width*p.duration).toFixed(1);
+  const out=p.outPoint>0?p.outPoint:p.duration;
+  if(Math.abs(s-(p.inPoint||0))<=Math.abs(s-out)){if(s<out-0.1)p.inPoint=Math.max(0,s)}else{if(s>p.inPoint+0.1)p.outPoint=s>=p.duration-0.05?0:s}
+  $('#e-in').value=(+p.inPoint).toFixed(1);$('#e-out').value=(+p.outPoint).toFixed(1);drawWave();saveSoon()});
+window.addEventListener('resize',()=>drawWave());
+
+/* ---------- UI loop ---------- */
+let edWasLive=false;
+function frame(){
+  players.forEach(pl=>{const p=padById(pl.padId);if(!p)return;
+    const out=p.outPoint>0?p.outPoint:(pl.el.duration||p.duration||1),ct=pl.el.currentTime,a=p.inPoint||0;
+    const q=Math.max(0,Math.min(1,(ct-a)/Math.max(0.01,out-a)));
+    document.querySelectorAll(`[data-prog="${p.id}"]`).forEach(pr=>{pr.style.width=(q*100).toFixed(1)+'%'});
+    const txt=p.loop?'loop':'-'+fmt((out-ct)/(p.speed||1));document.querySelectorAll(`[data-ptime="${p.id}"]`).forEach(t=>{t.textContent=txt});
+  });
+  const p=S.editing&&padById(S.editing);
+  if(p&&!$('#ed').hidden){const pl=players.get(p.id);const live=!!(pl&&!pl.stopping);const ct=live?pl.el.currentTime:(p.inPoint||0);
+    $('#e-ro').firstChild.nodeValue=fmt(ct);if(live)drawWave(ct);else if(edWasLive)drawWave();edWasLive=live}
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Rail & keys ---------- */
+$('#masterBox').innerHTML=vsHTML('master',{label:'Volume master',icon:'master',min:0,max:1,step:0.01,kstep:0.05,fmt:pct,get:()=>S.masterVolume,
+  set:v=>{S.masterVolume=v;if(master)master.gain.setTargetAtTime(v,ctx.currentTime,0.03);saveSoon()}});
+$('#stopAll').onclick=()=>stopAll(0.08);
+$('#fadeAll').onclick=fadeAll;
+$('#helpBtn').onclick=()=>{$('#help').hidden=false};
+$('#helpClose').onclick=()=>{$('#help').hidden=true};
+$('#help').addEventListener('click',e=>{if(e.target.id==='help')e.target.hidden=true});
+document.addEventListener('keydown',e=>{
+  if(e.target.matches('input[type=text],input[type=number]')||e.target.closest('.vs'))return;
+  if(e.key==='Escape'){stopAll(0.03);$('#help').hidden=true;$('#proj').hidden=true;$('#midi').hidden=true;$('#add').hidden=true;if(!$('#ed').hidden)closeEditor()}
+});
+let toastT=null;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},3200)}
+
+/* ---------- Example pads (first run only) ---------- */
+function wav(buf){const ch=buf.numberOfChannels,len=buf.length,sr=buf.sampleRate,ab=new ArrayBuffer(44+len*ch*2),v=new DataView(ab);let p=0;
+  const w=s=>{for(const c of s)v.setUint8(p++,c.charCodeAt(0))},u32=x=>{v.setUint32(p,x,true);p+=4},u16=x=>{v.setUint16(p,x,true);p+=2};
+  w('RIFF');u32(36+len*ch*2);w('WAVE');w('fmt ');u32(16);u16(1);u16(ch);u32(sr);u32(sr*ch*2);u16(ch*2);u16(16);w('data');u32(len*ch*2);
+  const d=[];for(let c=0;c<ch;c++)d.push(buf.getChannelData(c));
+  for(let i=0;i<len;i++)for(let c=0;c<ch;c++){const s=Math.max(-1,Math.min(1,d[c][i]));v.setInt16(p,s<0?s*0x8000:s*0x7fff,true);p+=2}
+  return new Blob([ab],{type:'audio/wav'})}
+async function synth(sec,fn){const O=window.OfflineAudioContext||window.webkitOfflineAudioContext;const oc=new O(2,22050*sec,22050);fn(oc);return await oc.startRendering()}
+async function makeExamples(){
+  const pad=await synth(12,oc=>{[220,277.18,329.63,440].forEach((f,i)=>{const o=oc.createOscillator(),g=oc.createGain();o.frequency.value=f;o.type=i%2?'triangle':'sine';
+    g.gain.setValueAtTime(0,0);g.gain.linearRampToValueAtTime(0.09,2.5);g.gain.setValueAtTime(0.09,9.5);g.gain.linearRampToValueAtTime(0,12);o.connect(g).connect(oc.destination);o.start()})});
+  const pulse=await synth(8,oc=>{for(let t=0;t<8;t+=0.5){const o=oc.createOscillator(),g=oc.createGain(),kick=(t%2===0);o.frequency.setValueAtTime(kick?110:1400,t);if(kick)o.frequency.exponentialRampToValueAtTime(45,t+0.18);
+    g.gain.setValueAtTime(kick?0.7:0.18,t);g.gain.exponentialRampToValueAtTime(0.001,t+(kick?0.3:0.05));o.connect(g).connect(oc.destination);o.start(t);o.stop(t+0.35)}});
+  const bell=await synth(5,oc=>{[[660,0.3],[1821,0.12],[2640,0.06]].forEach(([f,a])=>{const o=oc.createOscillator(),g=oc.createGain();o.frequency.value=f;
+    g.gain.setValueAtTime(a,0);g.gain.exponentialRampToValueAtTime(0.0005,4.8);o.connect(g).connect(oc.destination);o.start()})});
+  const mk=async(buf,slot,name,opts)=>{const blob=wav(buf),p=Object.assign(newPad(0,slot,name,uid(),{duration:buf.duration,peaks:peaksOf(buf)}),opts);await attach(p,blob,true);S.pads.push(p)};
+  await mk(pad,0,'Pad em Lá (exemplo)',{loop:true,fadeIn:2,fadeOut:3,stopMode:'fade',color:'#9a8bff'});
+  await mk(pulse,1,'Pulso 120 bpm (exemplo)',{loop:true,color:'#44b8d6'});
+  await mk(bell,2,'Sino (exemplo)',{fadeOut:1,color:'#f2b33d'});
+  saveSoon();
+}
+// Older layer-based sets become pads in bank A, one exclusive group per old layer.
+function migrate(old){const out=[];let slot=0;(old.tracks||[]).forEach((t,ti)=>{[...t.clips].sort((a,b)=>a.colIndex-b.colIndex).forEach(c=>{
+  if(slot>=BANKS*PADS_PER_BANK)return;const b=Math.floor(slot/PADS_PER_BANK),s=slot%PADS_PER_BANK;slot++;
+  out.push({id:c.id,bank:b,slot:s,name:c.name,fileKey:c.fileKey,fileName:c.fileName,color:COLORS[ti%COLORS.length],volume:c.volume??1,fadeIn:c.fadeIn||0,fadeOut:c.fadeOut||0,
+    xfTime:c.xfTime??1.5,speed:c.speed||1,loop:!!c.loop,stopMode:'cut',inPoint:c.inPoint||0,outPoint:c.outPoint||0,duration:c.duration||0,peaks:c.peaks,keep:c.keep,driveId:c.driveId,driveMime:c.driveMime})})});
+  return out}
+
+
+/* ---------- Projects: save, save as, new, open, recent, export, import ---------- */
+function isDirty(){return !proj.savedHash||hashStr(JSON.stringify(snapshot()))!==proj.savedHash}
+function when(ts){if(!ts)return'';const d=new Date(ts);const p=n=>String(n).padStart(2,'0');return p(d.getDate())+'/'+p(d.getMonth()+1)+' '+p(d.getHours())+':'+p(d.getMinutes())}
+function paintProj(){
+  const dirty=isDirty(),b=$('#projBtn');
+  const txt=!proj.id?(S.pads.length?'● não salvo':'novo'):dirty?'● não salvo':'salvo '+when(proj.savedAt).slice(6);
+  $('#projName').textContent=proj.name;$('#projState').textContent=txt;
+  b.classList.toggle('dirty',dirty&&(!!proj.id||S.pads.length>0));
+  $('#pName').textContent=proj.name;const st=$('#pState');st.textContent=!proj.id?(S.pads.length?'Ainda não salvo':'Projeto novo'):dirty?'Alterações não salvas':'Salvo em '+when(proj.savedAt);st.classList.toggle('dirty',dirty);
+}
+async function listProjects(){const l=await idbGet('kv','projects');return Array.isArray(l)?l:[]}
+async function putMeta(meta){const l=await listProjects();const i=l.findIndex(x=>x.id===meta.id);if(i>=0)l[i]=meta;else l.push(meta);return idbPut('kv','projects',l)}
+async function saveProject(asName){
+  if(!db){toast('Este navegador não deixa guardar projetos. Use Exportar arquivo.');return false}
+  const now=Date.now();
+  if(asName!=null||!proj.id){proj.id=uid();proj.createdAt=now;if(asName)proj.name=asName}
+  const data=snapshot();
+  const ok=await idbPut('kv','proj:'+proj.id,data);if(!ok){toast('Não consegui salvar o projeto. O iPad pode estar sem espaço.');return false}
+  await putMeta({id:proj.id,name:proj.name,createdAt:proj.createdAt||now,updatedAt:now,openedAt:now,pads:data.pads.length});
+  proj.savedHash=hashStr(JSON.stringify(data));proj.savedAt=now;saveSoon();paintProj();toast('Projeto salvo: '+proj.name);
+  if(!$('#proj').hidden)renderProjList();return true;
+}
+async function loadState(st){
+  S.pads=(st.pads||[]).map(p=>({stopMode:p.stopMode||(p.retrig==='stop'&&p.fadeOut>0?'fade':'cut'),...p}));
+  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};
+  S.decks.forEach((d,i)=>{d.cue=null;d.bank=i;d.vol=1});S.active=0;
+  (st.banks||[st.bank||0,1,2]).forEach((b,i)=>{if(S.decks[i])S.decks[i].bank=Math.min(BANKS-1,b||0)});
+  (st.deckVols||[]).forEach((v,i)=>{if(S.decks[i]&&isFinite(v))S.decks[i].vol=v});
+  for(const p of S.pads){if(blobs.has(p.fileKey))continue;const b=await idbGet('files',p.fileKey);if(b)blobs.set(p.fileKey,b);else p.missing=true}
+  if(master&&ctx)master.gain.setTargetAtTime(S.masterVolume,ctx.currentTime,0.02);
+  S.decks.forEach((d,i)=>{if(deckGains[i]&&ctx)deckGains[i].gain.setTargetAtTime(d.vol,ctx.currentTime,0.02)});
+}
+function renderAll(){if(!$('#ed').hidden){$('#ed').hidden=true;S.editing=null}vsPaint('master');renderGrid();paintProj()}
+async function openProject(id){
+  const data=await idbGet('kv','proj:'+id),l=await listProjects(),meta=l.find(x=>x.id===id);
+  if(!data||!meta){toast('Projeto não encontrado neste iPad.');return}
+  stopAll(0.05);await loadState(data);
+  proj={id,name:meta.name,createdAt:meta.createdAt,savedAt:meta.updatedAt,savedHash:hashStr(JSON.stringify(snapshot()))};
+  meta.openedAt=Date.now();await putMeta(meta);renderAll();saveSoon();closeProj();
+  const miss=S.pads.filter(p=>p.missing).length;toast('Aberto: '+meta.name+(miss?' · '+miss+' música'+(miss>1?'s':'')+' para reconectar':''));
+}
+function newProject(){stopAll(0.05);S.pads=[];S.decks.forEach((d,i)=>{d.cue=null;d.bank=i});S.active=0;
+  proj={id:null,name:'Sem título',createdAt:null,savedAt:null,savedHash:hashStr(JSON.stringify(snapshot()))};renderAll();saveSoon();closeProj();toast('Novo projeto.')}
+async function deleteProject(id){
+  const l=(await listProjects()).filter(x=>x.id!==id);await idbPut('kv','projects',l);
+  const data=await idbGet('kv','proj:'+id);await idbDel('kv','proj:'+id);
+  if(proj.id===id){proj.id=null;proj.savedHash=null;proj.savedAt=null;saveSoon()}
+  if(data&&data.pads)gcFiles(data.pads.map(p=>p.fileKey));renderProjList();
+}
+// Remove stored audio that no pad in the open set or in any saved project uses any more.
+async function gcFiles(keys){
+  const used=new Set(S.pads.map(p=>p.fileKey));
+  for(const m of await listProjects()){const d=await idbGet('kv','proj:'+m.id);if(d&&d.pads)d.pads.forEach(p=>used.add(p.fileKey))}
+  for(const k of keys){if(!k||used.has(k))continue;await idbDel('files',k);blobs.delete(k);const u=urls.get(k);if(u){URL.revokeObjectURL(u);urls.delete(k)}}
+}
+let projTab='recent';
+async function renderProjList(){
+  let l=await listProjects();const box=$('#pList');
+  if(projTab==='recent'){l=l.sort((a,b)=>(b.openedAt||0)-(a.openedAt||0)).slice(0,6)}else{l=l.sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'))}
+  if(!l.length){box.innerHTML='<div class="pempty">Nenhum projeto salvo ainda. Toque em Salvar para guardar este.</div>';return}
+  box.innerHTML=l.map(m=>`<div class="prow ${m.id===proj.id?'cur':''}"><div><b>${esc(m.name)}</b><span>${m.id===proj.id?'aberto · ':''}salvo ${when(m.updatedAt)} · ${m.pads||0} pads</span></div>
+    <button class="btn ${m.id===proj.id?'':'on'}" data-open="${m.id}">${m.id===proj.id?'Reabrir':'Abrir'}</button><button class="btn x" data-delp="${m.id}" aria-label="Apagar projeto ${esc(m.name)}">✕</button></div>`).join('');
+}
+function openProj(){paintProj();$('#pAsRow').hidden=true;segSet('#pTabs',projTab);renderProjList();$('#proj').hidden=false}
+function closeProj(){$('#proj').hidden=true}
+$('#projBtn').onclick=openProj;
+$('#pClose').onclick=closeProj;
+$('#proj').addEventListener('click',e=>{
+  if(e.target.id==='proj'){closeProj();return}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.id==='pSave'){saveProject();return}
+  if(b.id==='pSaveAs'){const r=$('#pAsRow');r.hidden=!r.hidden;if(!r.hidden){const i=$('#pAsName');i.value=proj.id?proj.name+' (cópia)':(proj.name==='Sem título'?'':proj.name);i.focus()}return}
+  if(b.id==='pAsOk'){const n=$('#pAsName').value.trim();if(!n){toast('Dê um nome ao projeto.');return}saveProject(n).then(ok=>{if(ok)$('#pAsRow').hidden=true});return}
+  if(b.id==='pNew'){if(isDirty()&&S.pads.length)armed(b,newProject,'Descartar?');else newProject();return}
+  if(b.closest('#pTabs')){projTab=b.dataset.v;segSet('#pTabs',projTab);renderProjList();return}
+  if(b.dataset.open){const id=b.dataset.open;if(isDirty()&&S.pads.length)armed(b,()=>openProject(id),'Descartar alterações?');else openProject(id);return}
+  if(b.dataset.delp){const id=b.dataset.delp;armed(b,()=>deleteProject(id),'Apagar?');return}
+  if(b.id==='pExport'){exportProject();return}
+  if(b.id==='pImport'){$('#projPicker').click();return}
+});
+$('#pAsName').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#pAsOk').click()}});
+let dlP=null;
+function getDownloads(){if(!dlP)dlP=(window.claude&&typeof window.claude.use==='function')?window.claude.use('downloads').catch(()=>null):Promise.resolve(null);return dlP}
+async function exportProject(){
+  const dl=await getDownloads();
+  const body=JSON.stringify({lumia:'ipad-project',v:3,name:proj.name,exportedAt:new Date().toISOString(),data:snapshot()});
+  const fname=(proj.name||'projeto').replace(/[\\/:*?"<>|]+/g,'-').slice(0,80)+'.lumia.json';
+  if(!dl){try{const u=URL.createObjectURL(new Blob([body],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('Arquivo exportado: '+fname)}catch(e){toast('Não foi possível exportar aqui.')}return}
+  try{await dl.save({filename:fname,data:body});toast('Arquivo exportado: '+fname)}
+  catch(e){const c=e&&e.code;toast(c==='declined'?'Exportação cancelada.':c==='rate_limited'?'Já existe um pedido de download aberto. Tente em instantes.':'Não foi possível exportar aqui ('+(c||'erro')+').')}
+}
+$('#projPicker').addEventListener('change',async e=>{
+  const file=(e.target.files||[])[0];e.target.value='';if(!file)return;
+  let obj;try{obj=JSON.parse(await file.text())}catch(_){toast('Esse arquivo não é um projeto do Lumia.');return}
+  if(!obj||obj.lumia!=='ipad-project'||!obj.data||!Array.isArray(obj.data.pads)){toast('Esse arquivo não é um projeto do Lumia.');return}
+  stopAll(0.05);await loadState(obj.data);
+  proj={id:null,name:(obj.name||file.name.replace(/\.lumia\.json$|\.json$/i,'')),createdAt:null,savedAt:null,savedHash:null};
+  renderAll();await saveProject(proj.name);closeProj();
+  const miss=S.pads.filter(p=>p.missing).length;if(miss)setTimeout(()=>toast(miss+' música'+(miss>1?'s':'')+' para reconectar: importe os arquivos pelos pads vazios ou pelo toque no pad apagado.'),1600);
+});
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();if(e.shiftKey){openProj();$('#pSaveAs').click()}else saveProject()}});
+
+/* ---------- Boot ---------- */
+(async()=>{
+  db=await idbOpen();
+  if(db){storeOk=true;try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}}
+  paintStore();
+  let st;try{st=await idbGet('kv','pads')}catch(e){}
+  if(!st){let old;try{old=await idbGet('kv','state')}catch(e){}if(old&&old.tracks){st={pads:migrate(old),masterVolume:old.masterVolume??0.9,bank:0}}}
+  if(st&&st.pads){
+    await loadState(st);if(st.project)proj=Object.assign(proj,st.project);
+    saveSoon();
+  }else{try{await makeExamples()}catch(e){}}
+  vsPaint('master');renderGrid();paintProj();paintAudio();requestAnimationFrame(frame);midiInit();
+})();
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator&&location.protocol==='https:'){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
