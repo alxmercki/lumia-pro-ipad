@@ -83,6 +83,11 @@ button{font:inherit;color:inherit}
 .mlabel{text-align:center;font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:600}
 .mwrap{flex:1;min-height:120px;display:flex;justify-content:center}
 .mwrap .vs{width:64px}
+.audio-settings{min-height:44px;background:var(--pad);cursor:pointer}
+.balance{display:flex;flex-direction:column;gap:6px;min-width:210px;max-width:100%}
+.balance label,.balance output{font-size:13px;color:var(--muted)}
+.balance input{width:100%;min-height:44px;margin:0;accent-color:var(--accent);touch-action:pan-y}
+.balance .seg{display:flex}.balance .seg button{flex:1;min-height:44px}
 .status{display:flex;flex-direction:column;gap:6px}
 .pill{font-family:var(--mono);font-size:11px;padding:5px 4px;border-radius:99px;border:1px solid var(--line2);white-space:nowrap;color:var(--muted);text-align:center}
 .pill.warn{border-color:var(--cue);color:var(--cue)}
@@ -328,7 +333,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
 <body>
 <div class="app">
   <aside class="rail">
-    <div class="brand"><b>LUMIA</b><span>PRO · iPAD</span></div>
+    <div class="brand"><b>LUMIA</b><span>PRO · iPAD · 9</span></div>
     <button class="btn projbtn" id="projBtn" title="Salvar, abrir e projetos recentes"><b id="projName">Sem título</b><small id="projState">não salvo</small></button>
     <button class="btn stop" id="stopAll" title="Parar tudo (Esc)"><i>■</i>Parar tudo</button>
     <button class="btn fade" id="fadeAll" title="Fade de 3 s em tudo que está tocando"><span>Fade 3s</span></button>
@@ -336,6 +341,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
     <div class="wins" id="wins" role="group" aria-label="Quantas janelas de pads"><button data-win="1">1</button><button data-win="2">2</button><button data-win="3">3</button></div>
     <div class="mlabel">MASTER</div>
     <div class="mwrap" id="masterBox"></div>
+    <button class="pill audio-settings" id="audioSettings" disabled>Áudio L/R</button>
     <div class="status"><span class="pill warn" id="audioPill">Som: toque</span><span class="pill" id="storePill">…</span><button class="pill warn" id="midiPill" title="Controlador MIDI">MIDI –</button><button class="pill link" id="linkPill" hidden title="Conectar as músicas deste projeto">⚠ faltando</button><button class="pill" id="playedPill" hidden title="Apagar as marcas de pads já tocados">✓ limpar</button></div>
     <div class="sep" aria-hidden="true"></div>
     <div class="railfoot"><button class="btn arr" id="arrBtn" aria-pressed="false" title="Travar a posição dos pads para não arrastar sem querer">Travar</button><button class="btn help" id="helpBtn" aria-label="Ajuda">?</button></div>
@@ -368,10 +374,24 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
         <div class="opt"><span>1º toque no pad</span><div class="seg" id="e-start"><button data-v="cue">Deixa em CUE</button><button data-v="direct">Toca direto</button></div></div>
         <div class="opt"><span>Loop</span><div class="seg" id="e-loop"><button data-v="0">Off</button><button data-v="1">On (IN → OUT)</button></div></div>
         <div class="opt"><span>Stop (ao parar ou trocar de pad)</span><div class="seg" id="e-stopmode"><button data-v="cut">Stop seco</button><button data-v="fade">Stop com fade out</button></div></div>
+        <div class="opt"><span>Balanço do pad</span><div id="padBalanceBox"></div></div>
         <div class="edfoot"><button class="btn" id="e-replace">Trocar arquivo</button><button class="btn x" id="e-del">Remover pad</button></div>
       </div>
       <div class="edmix" id="e-mix"></div>
     </div>
+  </div>
+</div>
+
+<!-- Stereo controls -->
+<div class="sheet" id="audioSettingsSheet" hidden>
+  <div class="card" role="dialog" aria-labelledby="audioTitle">
+    <h3 id="audioTitle">Áudio estéreo · master</h3>
+    <p>Center mantém os canais originais. Left reduz o canal direito; Right reduz o esquerdo.</p>
+    <div id="masterBalanceBox"></div>
+    <p>Teste com fones ou saída estéreo, master em Center. Os testes respeitam o volume e o balanço master. Não alteram os pads.</p>
+    <div class="btns"><button class="btn" id="testLeft">Testar Left</button><button class="btn" id="testRight">Testar Right</button><button class="btn" id="stopTest">Parar teste</button></div>
+    <p id="channelTestStatus" aria-live="polite">Nenhum teste tocando.</p>
+    <div class="btns"><button class="btn on" id="closeAudioSettings">Fechar</button></div>
   </div>
 </div>
 
@@ -488,6 +508,7 @@ button.pill{cursor:pointer;background:transparent;font:inherit;font-family:var(-
   </div>
 </div>
 
+<script src="stereo-audio.js"></script>
 <script>
 (()=>{
 const $=s=>document.querySelector(s);
@@ -500,7 +521,7 @@ const fmt=s=>{if(!isFinite(s)||s<0)s=0;const m=Math.floor(s/60),r=s-m*60;return 
 const pct=v=>Math.round(v*100)+'%', secs=v=>(+v).toFixed(1)+'s', mult=v=>(+v).toFixed(2)+'x';
 
 let proj={id:null,name:'Sem título',createdAt:null,savedAt:null,savedHash:null};
-const S={played:new Set(),keepAudio:true,arrange:false,pick:null,pads:[],masterVolume:0.9,editing:null,nDecks:1,active:0,decks:[{bank:0,cue:null,vol:1},{bank:1,cue:null,vol:1},{bank:2,cue:null,vol:1}]};
+const S={played:new Set(),keepAudio:true,arrange:false,pick:null,pads:[],masterVolume:0.9,masterBalance:0,editing:null,nDecks:1,active:0,decks:[{bank:0,cue:null,vol:1},{bank:1,cue:null,vol:1},{bank:2,cue:null,vol:1}]};
 const D=()=>S.decks[S.active];
 const padById=id=>S.pads.find(p=>p.id===id);
 const padAt=(b,s)=>S.pads.find(p=>p.bank===b&&p.slot===s);
@@ -525,31 +546,33 @@ function idbPut(store,key,val){if(!db)return Promise.resolve(false);return new P
 function idbGet(store,key){if(!db)return Promise.resolve(undefined);return new Promise(res=>{try{const r=db.transaction(store).objectStore(store).get(key);r.onsuccess=()=>res(r.result);r.onerror=()=>res(undefined)}catch(e){res(undefined)}})}
 function idbDel(store,key){if(!db)return Promise.resolve();return new Promise(res=>{try{const tx=db.transaction(store,'readwrite');tx.objectStore(store).delete(key);tx.oncomplete=()=>res();tx.onerror=()=>res()}catch(e){res()}})}
 let saveT=null;
-function snapshot(){return {v:3,lockDrag:!!S.lockDrag,keepAudio:S.keepAudio,musicFolder:S.musicFolder||'',widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
+function snapshot(){return {v:3,lockDrag:!!S.lockDrag,keepAudio:S.keepAudio,musicFolder:S.musicFolder||'',widths:S.widths||{},nDecks:S.nDecks,banks:S.decks.map(d=>d.bank),deckVols:S.decks.map(d=>d.vol),masterVolume:S.masterVolume,masterBalance:S.masterBalance,pads:S.pads.map(p=>{const {missing,...rest}=p;return rest})}}
 let playedT=null;
 function savePlayed(){clearTimeout(playedT);playedT=setTimeout(()=>idbPut('kv','played',{project:proj.id||'',ids:[...S.played]}),300)}
 function clearPlayed(){S.played.clear();savePlayed();paint();toast('Marcas de tocado apagadas.')}
 function hashStr(t){let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return (h>>>0).toString(36)+':'+t.length}
-function saveSoon(){clearTimeout(saveT);saveT=setTimeout(async()=>{
+function saveSoon(){clearTimeout(saveT);saveT=setTimeout(saveNow,350)}
+async function saveNow(){clearTimeout(saveT);
   const data=snapshot();data.project={id:proj.id,name:proj.name,createdAt:proj.createdAt,savedHash:proj.savedHash,savedAt:proj.savedAt};
   const ok=await idbPut('kv','pads',data);if(!ok&&storeOk){storeOk=false;paintStore()}
   paintProj();
-},350)}
+}
 function paintStore(){const p=$('#storePill');p.textContent=storeOk?'Memória ok':'Sem memória';p.title=storeOk?'Músicas e ajustes ficam guardados neste iPad':'Este navegador não deixou salvar: tudo some ao recarregar';p.className='pill '+(storeOk?'':'warn')}
 
 const blobs=new Map(), urls=new Map();
 function urlFor(key){if(urls.has(key))return urls.get(key);const b=blobs.get(key);if(!b)return null;const u=URL.createObjectURL(b);urls.set(key,u);return u}
 
 /* ---------- Audio engine ---------- */
-let ctx=null, master=null;
+let ctx=null, master=null, masterBalance=null, channelTest=null;
+const balanceValue=LumiaStereo.clamp;
 const players=new Map(); // padId -> player
 const deckGains=[];
-function deckNode(d){ensureCtx();if(!deckGains[d]){const g=ctx.createGain();g.gain.value=S.decks[d].vol;g.connect(master);deckGains[d]=g}return deckGains[d]}
+function deckNode(d){ensureCtx();if(!deckGains[d]){const g=LumiaStereo.stereoGain(ctx);g.gain.value=S.decks[d].vol;g.connect(master);deckGains[d]=g}return deckGains[d]}
 function setDeckVol(d,v){S.decks[d].vol=v;if(deckGains[d]&&ctx)deckGains[d].gain.setTargetAtTime(v,ctx.currentTime,0.03);saveSoon()}
-function ensureCtx(){if(!ctx){const C=window.AudioContext||window.webkitAudioContext;ctx=new C();master=ctx.createGain();master.gain.value=S.masterVolume;master.connect(ctx.destination);ctx.onstatechange=paintAudio}return ctx}
-function paintAudio(){const p=$('#audioPill');const on=ctx&&ctx.state==='running';p.textContent=on?'Som ativo':'Som: toque';p.title=on?'':'O iPad só libera o som depois de um toque na tela';p.className='pill '+(on?'ok':'warn')}
+function ensureCtx(){if(!ctx){const C=window.AudioContext||window.webkitAudioContext;ctx=new C();LumiaStereo.configureDestination(ctx);master=LumiaStereo.stereoGain(ctx);master.gain.value=S.masterVolume;masterBalance=LumiaStereo.createBalance(ctx,S.masterBalance);master.connect(masterBalance.input);masterBalance.output.connect(ctx.destination);ctx.onstatechange=paintAudio}return ctx}
+function paintAudio(){const p=$('#audioPill');const on=ctx&&ctx.state==='running',mono=on&&ctx.destination.channelCount<2;p.textContent=on?(mono?'Saída: mono':'Som: estéreo'):'Som: toque';p.title=on?(mono?'A rota de áudio informa apenas um canal. Use uma saída estéreo.':'Circuito L/R ativo; confira os canais em Áudio L/R.'):'O iPad só libera o som depois de um toque na tela';p.className='pill '+(on&&!mono?'ok':'warn')}
 function unlock(){ensureCtx();if(ctx.state!=='running'){ctx.resume().then(paintAudio).catch(()=>{});
-  try{const b=ctx.createBuffer(1,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)}catch(e){}}
+  try{const b=ctx.createBuffer(2,1,22050),s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start(0)}catch(e){}}
   wake()}
 document.addEventListener('pointerdown',unlock,{capture:true});
 document.addEventListener('keydown',unlock,{capture:true});
@@ -566,7 +589,7 @@ function tap(pad,d=S.active){
   if(dk.cue===pad.id||pad.startMode==='direct'){play(pad,d);return}
   stopOthers(d,null);dk.cue=pad.id;paint();
 }
-function play(pad,d=S.active){if(!pad||pad.missing){if(pad)relink(pad);return}const dk=S.decks[d];stopOthers(d,pad.id);if(dk.cue===pad.id)dk.cue=null;if(!isLive(pad.id))start(pad,d);else{const pl=players.get(pad.id);if(pl.deck!==d){try{pl.g.disconnect();pl.g.connect(deckNode(d))}catch(e){}pl.deck=d}paint()}}
+function play(pad,d=S.active){if(!pad||pad.missing){if(pad)relink(pad);return}const dk=S.decks[d];stopOthers(d,pad.id);if(dk.cue===pad.id)dk.cue=null;if(!isLive(pad.id))start(pad,d);else{const pl=players.get(pad.id);if(pl.deck!==d){try{pl.balance.output.disconnect();pl.balance.output.connect(deckNode(d))}catch(e){}pl.deck=d}paint()}}
 function stopTime(pad,mode){return (mode||pad.stopMode)==='fade'?(pad.fadeOut>0?pad.fadeOut:2):0.03}
 function stopPad(pad,mode){const pl=players.get(pad.id);if(pl&&!pl.stopping)fadeOutPlayer(pl,stopTime(pad,mode))}
 function stopOthers(d,exceptId){players.forEach((pl,id)=>{if(id!==exceptId&&pl.deck===d&&!pl.stopping){const p=padById(id);if(p)stopPad(p);else fadeOutPlayer(pl,0.03)}})}
@@ -575,9 +598,9 @@ function start(pad,d=S.active){
   ensureCtx();if(ctx.state!=='running')ctx.resume().catch(()=>{});
   const el=new Audio();el.src=url;el.preload='auto';el.setAttribute('playsinline','');
   el.playbackRate=pad.speed||1;try{el.preservesPitch=true;el.webkitPreservesPitch=true}catch(e){}
-  const src=ctx.createMediaElementSource(el),g=ctx.createGain();g.gain.value=0;src.connect(g);g.connect(deckNode(d));
+  const src=ctx.createMediaElementSource(el),g=LumiaStereo.stereoGain(ctx),balance=LumiaStereo.createBalance(ctx,pad.balance);g.gain.value=0;src.connect(g);g.connect(balance.input);balance.output.connect(deckNode(d));
   S.played.add(pad.id);savePlayed();
-  const p={padId:pad.id,deck:d,el,src,g,stopping:false,fading:false,started:false};
+  const p={padId:pad.id,deck:d,el,src,g,balance,stopping:false,fading:false,started:false};
   players.set(pad.id,p);
   const fin=Math.max(0.01,pad.fadeIn||0);
   let begun=false;
@@ -588,14 +611,14 @@ function start(pad,d=S.active){
   el.play().catch(()=>{toast('O iPad segurou o som. Toque uma vez na tela e tente de novo.');fadeOutPlayer(p,0.01)});
   wake();paint();
 }
-function kill(p){try{p.el.pause()}catch(e){}try{p.src.disconnect();p.g.disconnect()}catch(e){}try{p.el.removeAttribute('src');p.el.load()}catch(e){}}
+function kill(p){try{p.el.pause()}catch(e){}try{p.src.disconnect();p.g.disconnect();p.balance.disconnect()}catch(e){}try{p.el.removeAttribute('src');p.el.load()}catch(e){}}
 function fadeOutPlayer(p,s){
   if(p.stopping)return;p.stopping=true;
   if(ctx){const now=ctx.currentTime,v=p.g.gain.value;p.g.gain.cancelScheduledValues(now);p.g.gain.setValueAtTime(v,now);p.g.gain.linearRampToValueAtTime(0,now+s)}
   setTimeout(()=>{kill(p);if(players.get(p.padId)===p)players.delete(p.padId);paint()},s*1000+80);
   paint();
 }
-function stopAll(s=0.08){[...players.values()].forEach(p=>fadeOutPlayer(p,s));S.decks.forEach(d=>d.cue=null);paint()}
+function stopAll(s=0.08){stopChannelTest();[...players.values()].forEach(p=>fadeOutPlayer(p,s));S.decks.forEach(d=>d.cue=null);paint()}
 let fadeT=null;
 function fadeAll(){stopAll(3);const b=$('#fadeAll');b.classList.remove('busy');void b.offsetWidth;b.classList.add('busy');clearTimeout(fadeT);fadeT=setTimeout(()=>b.classList.remove('busy'),3000)}
 function isLive(id){const p=players.get(id);return !!(p&&!p.stopping)}
@@ -651,7 +674,7 @@ async function analyse(blob){
 }
 function peaksOf(buf,n=300){const d=buf.getChannelData(0),step=Math.max(1,Math.floor(d.length/n)),out=[];
   for(let i=0;i<n;i++){let m=0;const s=i*step,e=Math.min(d.length,s+step);for(let j=s;j<e;j+=16){const v=Math.abs(d[j]);if(v>m)m=v}out.push(+m.toFixed(3))}return out}
-function newPad(bank,slot,name,fileKey,meta){return{id:uid(),bank,slot,name,fileKey,color:COLORS[0],volume:1,fadeIn:0,fadeOut:0,xfTime:1.5,speed:1,loop:false,stopMode:'cut',startMode:'cue',inPoint:0,outPoint:0,duration:meta.duration||0,peaks:meta.peaks}}
+function newPad(bank,slot,name,fileKey,meta){return{id:uid(),bank,slot,name,fileKey,color:COLORS[0],volume:1,balance:0,fadeIn:0,fadeOut:0,xfTime:1.5,speed:1,loop:false,stopMode:'cut',startMode:'cue',inPoint:0,outPoint:0,duration:meta.duration||0,peaks:meta.peaks}}
 const isAudio=f=>(f.type||'').startsWith('audio')||/\.(mp3|m4a|aac|wav|aiff?|flac|caf|ogg|opus)$/i.test(f.name||'');
 function nextFree(bank,slot){for(let s=slot;s<SLOT_MAX;s++){if(!padAt(bank,s))return[bank,s]}return null}
 async function attach(p,blob,keep,recalc){
@@ -1017,6 +1040,7 @@ $('#midi').addEventListener('click',e=>{if(e.target.id==='midi')e.target.hidden=
 function openEditor(id){
   const p=padById(id);if(!p)return;S.editing=id;
   ['e-vol','e-fin','e-fout','e-spd'].forEach(k=>delete VS[k]);
+  $('#padBalanceBox').innerHTML=balanceHTML('pad',p.balance);
   $('#e-slot').textContent=label(p);$('#e-name').value=p.name;
   $('#e-colors').innerHTML=COLORS.map(c=>`<button data-color="${c}" style="--c:${c}" class="${c===p.color?'on':''}" aria-label="Cor ${c}"></button>`).join('');
   $('#e-in').value=(+p.inPoint).toFixed(1);$('#e-out').value=(+p.outPoint).toFixed(1);$('#e-dur').textContent='de '+fmt(p.duration);
@@ -1029,7 +1053,7 @@ function openEditor(id){
     st('Fade out','e-fout',{label:'Fade out',icon:'fout',min:0,max:10,step:0.1,kstep:0.5,fmt:secs,get:()=>p.fadeOut,set:v=>{p.fadeOut=v;saveSoon()}})+
     st('Veloc.','e-spd',{label:'Velocidade',icon:'speed',min:0.5,max:2,step:0.01,kstep:0.05,fmt:mult,get:()=>p.speed,set:v=>{p.speed=v;const pl=live();if(pl)pl.el.playbackRate=v;saveSoon()}});
   const del=$('#e-del');del.classList.remove('armed');del.textContent='Remover pad';
-  $('#ed').hidden=false;paint();requestAnimationFrame(()=>drawWave());
+  paintBalance('pad');$('#ed').hidden=false;paint();requestAnimationFrame(()=>drawWave());
 }
 function closeEditor(){if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();$('#ed').hidden=true;S.editing=null;renderGrid()}
 function segSet(sel,v){document.querySelectorAll(sel+' button').forEach(b=>b.classList.toggle('on',b.dataset.v===v))}
@@ -1042,6 +1066,7 @@ ed.addEventListener('click',e=>{
   if(b.id==='e-stopcut'){stopPad(p,'cut');return}
   if(b.id==='e-stopfade'){stopPad(p,'fade');return}
   if(b.dataset.color){p.color=b.dataset.color;document.querySelectorAll('#e-colors button').forEach(x=>x.classList.toggle('on',x===b));saveSoon();return}
+  if(b.closest('[data-balance]'))return;
   const seg=b.closest('.seg');
   if(seg){const v=b.dataset.v;segSet('#'+seg.id,v);
     if(seg.id==='e-loop'){p.loop=v==='1';paintLoop(p)}if(seg.id==='e-stopmode')p.stopMode=v;if(seg.id==='e-start'){p.startMode=v;renderGrid()}saveSoon();return}
@@ -1129,6 +1154,43 @@ function frame(){
   requestAnimationFrame(frame);
 }
 
+/* ---------- Stereo balance controls ---------- */
+function balanceHTML(scope,value){
+  const v=balanceValue(value);
+  return `<div class="balance" data-balance="${scope}"><label for="balance-${scope}">Left / Center / Right</label><input id="balance-${scope}" type="range" min="-1" max="1" step="0.01" value="${v}" aria-label="Balanço ${scope==='master'?'master':'do pad'}"><output></output><div class="seg"><button type="button" data-balance-value="-1">Left</button><button type="button" data-balance-value="0">Center</button><button type="button" data-balance-value="1">Right</button></div></div>`;
+}
+function paintBalance(scope){
+  const box=document.querySelector(`[data-balance="${scope}"]`);if(!box)return;
+  const p=padById(S.editing),v=balanceValue(scope==='master'?S.masterBalance:p&&p.balance);
+  box.querySelector('input').value=v;const text=v===0?'Center':(v<0?'Left ':'Right ')+Math.round(Math.abs(v)*100)+'%';
+  box.querySelector('input').setAttribute('aria-valuetext',text);box.querySelector('output').textContent=text;
+  box.querySelectorAll('[data-balance-value]').forEach(b=>{const on=+b.dataset.balanceValue===v;b.classList.toggle('on',on);b.setAttribute('aria-pressed',String(on))});
+}
+function setBalance(scope,value){
+  const v=balanceValue(value);
+  if(scope==='master'){S.masterBalance=v;if(masterBalance)masterBalance.set(v)}
+  else{const p=padById(S.editing);if(!p)return;p.balance=v;const pl=players.get(p.id);if(pl)pl.balance.set(v)}
+  paintBalance(scope);void saveNow();
+}
+function balanceEvent(e){const box=e.target.closest('[data-balance]');if(!box)return;
+  if(e.type==='input'&&e.target.type==='range')setBalance(box.dataset.balance,+e.target.value);
+  const b=e.target.closest('[data-balance-value]');if(e.type==='click'&&b)setBalance(box.dataset.balance,+b.dataset.balanceValue);
+}
+document.addEventListener('input',balanceEvent);document.addEventListener('click',balanceEvent);
+function stopChannelTest(){if(channelTest){const t=channelTest;channelTest=null;try{t.osc.stop()}catch(e){}t.gain.disconnect();t.balance.disconnect()}$('#channelTestStatus').textContent='Nenhum teste tocando.'}
+function testChannel(value){
+  unlock();stopChannelTest();const osc=ctx.createOscillator(),gain=ctx.createGain(),balance=LumiaStereo.createBalance(ctx,value),now=ctx.currentTime;
+  osc.frequency.value=value<0?440:880;gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(0.12,now+0.03);gain.gain.setValueAtTime(0.12,now+1.8);gain.gain.linearRampToValueAtTime(0,now+2);
+  osc.connect(gain);gain.connect(balance.input);balance.output.connect(master);const t={osc,gain,balance};channelTest=t;
+  $('#channelTestStatus').textContent='Teste '+(value<0?'Left':'Right')+' · 2 segundos';osc.onended=()=>{if(channelTest===t)stopChannelTest()};osc.start();osc.stop(now+2);
+}
+$('#masterBalanceBox').innerHTML=balanceHTML('master',S.masterBalance);paintBalance('master');
+$('#audioSettings').onclick=()=>{paintBalance('master');$('#audioSettingsSheet').hidden=false};
+function closeAudioSettings(){stopChannelTest();$('#audioSettingsSheet').hidden=true}
+$('#closeAudioSettings').onclick=closeAudioSettings;
+$('#audioSettingsSheet').onclick=e=>{if(e.target.id==='audioSettingsSheet')closeAudioSettings()};
+$('#testLeft').onclick=()=>testChannel(-1);$('#testRight').onclick=()=>testChannel(1);$('#stopTest').onclick=stopChannelTest;
+
 /* ---------- Rail & keys ---------- */
 $('#masterBox').innerHTML=vsHTML('master',{label:'Volume master',icon:'master',min:0,max:1,step:0.01,kstep:0.05,fmt:pct,get:()=>S.masterVolume,
   set:v=>{S.masterVolume=v;if(master)master.gain.setTargetAtTime(v,ctx.currentTime,0.03);saveSoon()}});
@@ -1139,7 +1201,7 @@ $('#helpClose').onclick=()=>{$('#help').hidden=true};
 $('#help').addEventListener('click',e=>{if(e.target.id==='help')e.target.hidden=true});
 document.addEventListener('keydown',e=>{
   if(e.target.matches('input[type=text],input[type=number]')||e.target.closest('.vs'))return;
-  if(e.key==='Escape'){stopAll(0.03);$('#help').hidden=true;$('#linkSheet').hidden=true;$('#proj').hidden=true;$('#midi').hidden=true;$('#add').hidden=true;if(!$('#ed').hidden)closeEditor()}
+  if(e.key==='Escape'){stopAll(0.03);closeAudioSettings();$('#help').hidden=true;$('#linkSheet').hidden=true;$('#proj').hidden=true;$('#midi').hidden=true;$('#add').hidden=true;if(!$('#ed').hidden)closeEditor()}
 });
 let toastT=null;
 function toast(msg){const el=$('#toast');el.textContent=msg;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},3200)}
@@ -1168,7 +1230,7 @@ async function makeExamples(){
 // Older layer-based sets become pads in bank A, one exclusive group per old layer.
 function migrate(old){const out=[];let slot=0;(old.tracks||[]).forEach((t,ti)=>{[...t.clips].sort((a,b)=>a.colIndex-b.colIndex).forEach(c=>{
   if(slot>=BANKS*PADS_PER_BANK)return;const b=Math.floor(slot/PADS_PER_BANK),s=slot%PADS_PER_BANK;slot++;
-  out.push({id:c.id,bank:b,slot:s,name:c.name,fileKey:c.fileKey,fileName:c.fileName,color:COLORS[ti%COLORS.length],volume:c.volume??1,fadeIn:c.fadeIn||0,fadeOut:c.fadeOut||0,
+  out.push({id:c.id,bank:b,slot:s,name:c.name,fileKey:c.fileKey,fileName:c.fileName,color:COLORS[ti%COLORS.length],volume:c.volume??1,balance:balanceValue(c.balance),fadeIn:c.fadeIn||0,fadeOut:c.fadeOut||0,
     xfTime:c.xfTime??1.5,speed:c.speed||1,loop:!!c.loop,stopMode:'cut',inPoint:c.inPoint||0,outPoint:c.outPoint||0,duration:c.duration||0,peaks:c.peaks,keep:c.keep,driveId:c.driveId,driveMime:c.driveMime})})});
   return out}
 
@@ -1303,13 +1365,14 @@ async function saveProject(asName,where){
   if(!$('#proj').hidden)renderProjList();return true;
 }
 async function loadState(st){
-  S.pads=(st.pads||[]).map(p=>({stopMode:p.stopMode||(p.retrig==='stop'&&p.fadeOut>0?'fade':'cut'),...p}));
-  S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};S.keepAudio=st.keepAudio!==false;S.lockDrag=!!st.lockDrag;S.musicFolder=st.musicFolder||'';S.pick=null;
+  S.pads=(st.pads||[]).map(p=>({stopMode:p.stopMode||(p.retrig==='stop'&&p.fadeOut>0?'fade':'cut'),...p,balance:balanceValue(p.balance)}));
+  S.masterBalance=balanceValue(st.masterBalance);S.masterVolume=st.masterVolume??0.9;S.nDecks=Math.min(3,Math.max(1,st.nDecks||1));S.widths=st.widths||{};S.keepAudio=st.keepAudio!==false;S.lockDrag=!!st.lockDrag;S.musicFolder=st.musicFolder||'';S.pick=null;
   S.decks.forEach((d,i)=>{d.cue=null;d.bank=i;d.vol=1});S.active=0;
   (st.banks||[st.bank||0,1,2]).forEach((b,i)=>{if(S.decks[i])S.decks[i].bank=Math.min(BANKS-1,b||0)});
   (st.deckVols||[]).forEach((v,i)=>{if(S.decks[i]&&isFinite(v))S.decks[i].vol=v});
   for(const p of S.pads){if(blobs.has(p.fileKey))continue;const b=await idbGet('files',p.fileKey);if(b)blobs.set(p.fileKey,b);else p.missing=true}
   if(master&&ctx)master.gain.setTargetAtTime(S.masterVolume,ctx.currentTime,0.02);
+  if(masterBalance)masterBalance.set(S.masterBalance);paintBalance('master');
   S.decks.forEach((d,i)=>{if(deckGains[i]&&ctx)deckGains[i].gain.setTargetAtTime(d.vol,ctx.currentTime,0.02)});
 }
 function renderAll(){if(!$('#ed').hidden){$('#ed').hidden=true;S.editing=null}vsPaint('master');renderGrid();paintProj();paintLink()}
@@ -1321,7 +1384,7 @@ async function openProject(id){
   meta.openedAt=Date.now();await putMeta(meta);renderAll();saveSoon();closeProj();askLinkIfNeeded();
   const miss=S.pads.filter(p=>p.missing).length;toast('Aberto: '+meta.name);
 }
-function newProject(){stopAll(0.05);S.played.clear();savePlayed();S.pads=[];S.decks.forEach((d,i)=>{d.cue=null;d.bank=i});S.active=0;
+function newProject(){stopAll(0.05);S.played.clear();savePlayed();S.pads=[];S.masterBalance=0;if(masterBalance)masterBalance.set(0);paintBalance('master');S.decks.forEach((d,i)=>{d.cue=null;d.bank=i});S.active=0;
   proj={id:null,name:'Sem título',createdAt:null,savedAt:null,savedHash:hashStr(JSON.stringify(snapshot()))};renderAll();saveSoon();closeProj();toast('Novo projeto.')}
 async function deleteProject(id){
   const all=await listProjects(),m=all.find(x=>x.id===id);
@@ -1395,6 +1458,7 @@ document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLower
     saveSoon();
   }else{try{await makeExamples()}catch(e){}}
   setLock(!!S.lockDrag);vsPaint('master');renderGrid();paintProj();paintLink();paintAudio();askLinkIfNeeded();requestAnimationFrame(frame);midiInit();
+  paintBalance('master');$('#audioSettings').disabled=false;document.documentElement.dataset.ready='true';
 })();
 })();
 </script>

@@ -22,3 +22,13 @@ Pads de áudio para palco no iPad, derivado do Lumia Pro v5. Um arquivo HTML, se
 - MIDI (nanoKONTROL2): o mapa está no código, mas o Safari do iPad não tem Web MIDI. Funciona em Chrome/Edge no computador; no iPad só com app nativo.
 - Busca direta no Google Drive só existe na versão dentro do Claude (usa o conector do Claude).
 - Com a tela bloqueada ou o Safari em segundo plano, o som pode parar.
+
+## Versão 9 — estéreo e balanço
+
+- Botão **Áudio L/R**, abaixo do master: balanço geral Left / Center / Right e teste dos canais.
+- Menu **⋯** de cada pad: balanço individual. Center preserva os canais; Left atenua o direito e Right atenua o esquerdo.
+- Balanço salvo imediatamente no iPad e incluído nos projetos/backup. Projetos antigos abrem em Center.
+- Para testar, desative Áudio Mono nos ajustes de acessibilidade do iPad e use fones ou interface estéreo. A indicação na tela descreve o circuito; confirme os canais na saída física.
+- Atualização: conecte à internet, abra o app, feche e reabra. Confirme **PRO · iPAD · 9** e o botão **Áudio L/R**.
+
+Teste automatizado: `PLAYWRIGHT_PATH=/caminho/para/playwright node test-stereo.cjs`, com servidor local na porta 8476. Use `TEST_WEBKIT=1` para WebKit com runtime instalado.
